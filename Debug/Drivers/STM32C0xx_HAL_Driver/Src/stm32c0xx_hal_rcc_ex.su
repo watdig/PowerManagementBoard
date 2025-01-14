@@ -1,0 +1,14 @@
+../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_rcc_ex.c:94:19:HAL_RCCEx_PeriphCLKConfig	32	static
+../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_rcc_ex.c:240:6:HAL_RCCEx_GetPeriphCLKConfig	16	static
+../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_rcc_ex.c:287:10:HAL_RCCEx_GetPeriphCLKFreq	24	static
+../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_rcc_ex.c:473:6:HAL_RCCEx_EnableLSCO	40	static
+../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_rcc_ex.c:498:6:HAL_RCCEx_DisableLSCO	8	static
+../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_rcc_ex.c:580:6:HAL_RCCEx_CRSConfig	24	static
+../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_rcc_ex.c:622:6:HAL_RCCEx_CRSSoftwareSynchronizationGenerate	8	static
+../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_rcc_ex.c:632:6:HAL_RCCEx_CRSGetSynchronizationInfo	16	static
+../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_rcc_ex.c:665:10:HAL_RCCEx_CRSWaitSynchronization	24	static
+../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_rcc_ex.c:748:6:HAL_RCCEx_CRS_IRQHandler	24	static
+../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_rcc_ex.c:813:13:HAL_RCCEx_CRS_SyncOkCallback	8	static
+../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_rcc_ex.c:824:13:HAL_RCCEx_CRS_SyncWarnCallback	8	static
+../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_rcc_ex.c:835:13:HAL_RCCEx_CRS_ExpectedSyncCallback	8	static
+../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_rcc_ex.c:851:13:HAL_RCCEx_CRS_ErrorCallback	16	static
