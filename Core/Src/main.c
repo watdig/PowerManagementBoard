@@ -32,7 +32,13 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define HR_SLAVE_ID              0
+#define HR_BAUD_RATE             1
+#define HR_ESTOP_SENSE           2
+#define HR_120_SENSE             3
+#define HR_RELAY_120V_COMMAND    4
+#define HR_RELAY_480V_COMMAND    5
+#define NUM_HOLDING_REGISTERS    6
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -48,9 +54,12 @@ DMA_HandleTypeDef hdma_usart1_rx;
 /* USER CODE BEGIN PV */
 
 uint16_t holding_register_database[NUM_HOLDING_REGISTERS] = {
-		0x0001,	// SLAVE_ID
-		0x0003, // BAUD_RATE
-		// TBD
+    0x0001, // HR_SLAVE_ID
+    0x0003, // HR_BAUD_RATE
+    0x0000, // HR_ESTOP_SENSE
+    0x0000, // HR_120_SENSE
+    0x0000, // HR_RELAY_120V_COMMAND
+    0x0000, // HR_RELAY_480V_COMMAND
 };
 
 /* USER CODE END PV */
@@ -113,7 +122,26 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /* USER CODE END WHILE */
+	  // Update HR_ESTOP_SENSE based on GPIO pin state
+	  holding_register_database[HR_ESTOP_SENSE] = HAL_GPIO_ReadPin(ESTOP_SENSE_GPIO_Port, ESTOP_SENSE_Pin);
+
+	  // Control 120V relay based on HR_RELAY_120V_COMMAND
+	  if (holding_register_database[HR_RELAY_120V_COMMAND]) {
+		  HAL_GPIO_WritePin(RELAY_120_GPIO_Port, RELAY_120_Pin, GPIO_PIN_SET);
+		  holding_register_database[HR_120_SENSE] = 1; // Update HR_120_SENSE to indicate 120V relay is powered
+	  } else {
+		  HAL_GPIO_WritePin(RELAY_120_GPIO_Port, RELAY_120_Pin, GPIO_PIN_RESET);
+		  holding_register_database[HR_120_SENSE] = 0; // Update HR_120_SENSE to indicate 120V relay is not powered
+	  }
+
+	  // Control 480V relay based on HR_RELAY_480V_COMMAND and HR_120_SENSE
+	  if (holding_register_database[HR_120_SENSE] && holding_register_database[HR_RELAY_480V_COMMAND]) {
+		  HAL_GPIO_WritePin(RELAY_480_GPIO_Port, RELAY_480_Pin, GPIO_PIN_SET);
+	  } else {
+		  HAL_GPIO_WritePin(RELAY_480_GPIO_Port, RELAY_480_Pin, GPIO_PIN_RESET);
+	  }
+
+
 	  if(modbus_rx())
 	  {
 		  int8_t status = 0;
@@ -164,6 +192,9 @@ int main(void)
 			  //Error_Handler();
 		  }
 	  }
+
+    /* USER CODE END WHILE */
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -274,8 +305,10 @@ static void MX_DMA_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
-/* USER CODE BEGIN MX_GPIO_Init_1 */
-/* USER CODE END MX_GPIO_Init_1 */
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+  /* USER CODE BEGIN MX_GPIO_Init_1 */
+  /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
@@ -283,9 +316,32 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
-/* USER CODE BEGIN MX_GPIO_Init_2 */
-/* USER CODE END MX_GPIO_Init_2 */
+  /* Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, RELAY_120_Pin | RELAY_480_Pin, GPIO_PIN_RESET);
+
+  /* Configure GPIO pin: E-Stop Sense (Input) */
+  GPIO_InitStruct.Pin = ESTOP_SENSE_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;  // Adjust to GPIO_PULLUP or GPIO_PULLDOWN if required
+  HAL_GPIO_Init(ESTOP_SENSE_GPIO_Port, &GPIO_InitStruct);
+
+  /* Configure GPIO pin: 120 Sense (Input) */
+  GPIO_InitStruct.Pin = SENSE_120_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;  // Adjust to GPIO_PULLUP or GPIO_PULLDOWN if required
+  HAL_GPIO_Init(SENSE_120_GPIO_Port, &GPIO_InitStruct);
+
+  /* Configure GPIO pins: 120V and 480V Relays (Output) */
+  GPIO_InitStruct.Pin = RELAY_120_Pin | RELAY_480_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;  // Adjust speed as necessary
+  HAL_GPIO_Init(RELAY_120_GPIO_Port, &GPIO_InitStruct);
+
+  /* USER CODE BEGIN MX_GPIO_Init_2 */
+  /* USER CODE END MX_GPIO_Init_2 */
 }
+
 
 /* USER CODE BEGIN 4 */
 
