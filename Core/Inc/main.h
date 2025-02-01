@@ -62,17 +62,6 @@ typedef enum gpio_write_e
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-// Input Pins
-//#define ESTOP_SENSE_Pin         GPIO_PIN_9
-//#define ESTOP_SENSE_GPIO_Port   GPIOB
-//#define SENSE_120_Pin           GPIO_PIN_15
-//#define SENSE_120_GPIO_Port     GPIOB
-//
-//// Output Pins
-//#define RELAY_120_Pin           GPIO_PIN_8
-//#define RELAY_120_GPIO_Port     GPIOB
-//#define RELAY_480_Pin           GPIO_PIN_7
-//#define RELAY_480_GPIO_Port     GPIOB
 
 /* USER CODE END EC */
 

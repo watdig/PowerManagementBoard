@@ -32,13 +32,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-//#define HR_SLAVE_ID              0
-//#define HR_BAUD_RATE             1
-//#define HR_ESTOP_SENSE           2
-//#define HR_120_SENSE             3
-//#define HR_RELAY_120V_COMMAND    4
-//#define HR_RELAY_480V_COMMAND    5
-//#define NUM_HOLDING_REGISTERS    6
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
