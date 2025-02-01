@@ -218,10 +218,9 @@ uint8_t get_rx_buffer(uint8_t index)
 {
 	if (index < MODBUS_RX_BUFFER_SIZE - 1)
 	{
-		uint8_t value = ((start_index + index) > (MODBUS_RX_BUFFER_SIZE - 1))?
+		return ((start_index + index) > (MODBUS_RX_BUFFER_SIZE - 1))?
 				modbus_rx_buffer[(start_index + index) - MODBUS_RX_BUFFER_SIZE] :
 				modbus_rx_buffer[start_index + index];
-		return value;
 	}
 	return 0xFF;
 }
