@@ -42,6 +42,7 @@ typedef enum holding_register_e
 	MB_BAUD_RATE,
 	GPIO_READ,
 	GPIO_WRITE,
+	WDG_TIMEOUT,
 	NUM_HOLDING_REGISTERS
 }holding_register_t;
 
@@ -83,6 +84,8 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define SENSE_120_Pin GPIO_PIN_15
 #define SENSE_120_GPIO_Port GPIOB
+#define MANUAL_Pin GPIO_PIN_6
+#define MANUAL_GPIO_Port GPIOB
 #define RELAY_480_Pin GPIO_PIN_7
 #define RELAY_480_GPIO_Port GPIOB
 #define RELAY_120_Pin GPIO_PIN_8

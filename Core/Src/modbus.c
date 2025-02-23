@@ -183,7 +183,7 @@ int8_t handle_chunk_miss()
 		{
 			// TODO: Log the chunk miss as an error
 			modbus_header = 1;
-			int8_t status = HAL_UART_Abort_IT(&huart1);
+			int8_t status = HAL_UART_Abort(&huart1);
 			if(status == HAL_OK)
 			{
 				status = modbus_set_rx();
@@ -559,6 +559,19 @@ void handle_range(uint16_t holding_register)
 			}
 			break;
 		}
+		case WDG_TIMEOUT:
+		{
+			if(holding_register_database[holding_register] < 10)
+			{
+				holding_register_database[holding_register] = 10;
+			}
+			else if(holding_register_database[holding_register] > 10000)
+			{
+				holding_register_database[holding_register] = 10000;
+			}
+
+			break;
+		}
 	}
 }
 
@@ -623,8 +636,44 @@ int8_t modbus_set_rx()
 	return status;
 }
 
+/*
+ 	 General Modbus Shutdown
+ */
+int8_t modbus_shutdown()
+{
+	int8_t status = HAL_UART_AbortReceive(&huart1);
+	if(status != HAL_OK)
+	{
+		return status;
+	}
+	status = HAL_UART_DeInit(&huart1);
 
+	return status;
+}
 
+/*
+ 	 General Modbus Startup
+ */
+int8_t modbus_startup()
+{
+	int8_t status = HAL_RS485Ex_Init(&huart1, UART_DE_POLARITY_HIGH, 0, 0);
+	if(status != HAL_OK)
+	{
+		return status;
+	}
+	status = HAL_UARTEx_SetTxFifoThreshold(&huart1, UART_TXFIFO_THRESHOLD_1_8);
+	if(status != HAL_OK)
+	{
+		return status;
+	}
+	status = HAL_UARTEx_SetRxFifoThreshold(&huart1, UART_RXFIFO_THRESHOLD_1_8);
+	if(status != HAL_OK)
+	{
+		return status;
+	}
+	status = HAL_UARTEx_DisableFifoMode(&huart1);
+	return status;
+}
 
 
 
