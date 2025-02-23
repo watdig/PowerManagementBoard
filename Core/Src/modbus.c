@@ -183,7 +183,7 @@ int8_t handle_chunk_miss()
 		{
 			// TODO: Log the chunk miss as an error
 			modbus_header = 1;
-			int8_t status = HAL_UART_Abort_IT(&huart1);
+			int8_t status = HAL_UART_Abort(&huart1);
 			if(status == HAL_OK)
 			{
 				status = modbus_set_rx();
@@ -218,10 +218,9 @@ uint8_t get_rx_buffer(uint8_t index)
 {
 	if (index < MODBUS_RX_BUFFER_SIZE - 1)
 	{
-		uint8_t value = ((start_index + index) > (MODBUS_RX_BUFFER_SIZE - 1))?
+		return ((start_index + index) > (MODBUS_RX_BUFFER_SIZE - 1))?
 				modbus_rx_buffer[(start_index + index) - MODBUS_RX_BUFFER_SIZE] :
 				modbus_rx_buffer[start_index + index];
-		return value;
 	}
 	return 0xFF;
 }
@@ -479,7 +478,7 @@ int8_t edit_multiple_registers()
 		return modbus_exception(MB_ILLEGAL_DATA_ADDRESS);
 	}
 
-	if((first_register_address >= 3 && last_register_address <= 33))
+	if((first_register_address <= GPIO_READ) && (last_register_address >= GPIO_READ))
 	{
 		// Ensure that sensor values are restricted to read-only
 		return modbus_exception(MB_ILLEGAL_FUNCTION);
@@ -540,7 +539,7 @@ void handle_range(uint16_t holding_register)
 {
 	switch(holding_register)
 	{
-		case 0:
+		case MODBUS_ID:
 		{
 			if(holding_register_database[holding_register] > 0xFF)
 			{
@@ -548,7 +547,7 @@ void handle_range(uint16_t holding_register)
 			}
 			break;
 		}
-		case 1:
+		case MB_BAUD_RATE:
 		{
 			if(holding_register_database[holding_register] < 2)
 			{
@@ -560,20 +559,17 @@ void handle_range(uint16_t holding_register)
 			}
 			break;
 		}
-		case 2:
+		case WDG_TIMEOUT:
 		{
-			if(holding_register_database[holding_register] > 1)
+			if(holding_register_database[holding_register] < 10)
 			{
-				holding_register_database[holding_register] = 1;
+				holding_register_database[holding_register] = 10;
 			}
-			break;
-		}
-		case 34 ... 36:
-		{
-			if(holding_register_database[holding_register] > 0x0FFF)
+			else if(holding_register_database[holding_register] > 10000)
 			{
-				holding_register_database[holding_register] = 0x0FFF;
+				holding_register_database[holding_register] = 10000;
 			}
+
 			break;
 		}
 	}
@@ -640,8 +636,44 @@ int8_t modbus_set_rx()
 	return status;
 }
 
+/*
+ 	 General Modbus Shutdown
+ */
+int8_t modbus_shutdown()
+{
+	int8_t status = HAL_UART_AbortReceive(&huart1);
+	if(status != HAL_OK)
+	{
+		return status;
+	}
+	status = HAL_UART_DeInit(&huart1);
 
+	return status;
+}
 
+/*
+ 	 General Modbus Startup
+ */
+int8_t modbus_startup()
+{
+	int8_t status = HAL_RS485Ex_Init(&huart1, UART_DE_POLARITY_HIGH, 0, 0);
+	if(status != HAL_OK)
+	{
+		return status;
+	}
+	status = HAL_UARTEx_SetTxFifoThreshold(&huart1, UART_TXFIFO_THRESHOLD_1_8);
+	if(status != HAL_OK)
+	{
+		return status;
+	}
+	status = HAL_UARTEx_SetRxFifoThreshold(&huart1, UART_RXFIFO_THRESHOLD_1_8);
+	if(status != HAL_OK)
+	{
+		return status;
+	}
+	status = HAL_UARTEx_DisableFifoMode(&huart1);
+	return status;
+}
 
 
 

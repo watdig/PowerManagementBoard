@@ -48,10 +48,16 @@ DMA_HandleTypeDef hdma_usart1_rx;
 /* USER CODE BEGIN PV */
 
 uint16_t holding_register_database[NUM_HOLDING_REGISTERS] = {
-		0x0001,	// SLAVE_ID
-		0x0003, // BAUD_RATE
-		// TBD
+    0x0001, // MODBUS_ID
+    0x0003, // MB_BAUD_RATE
+    0x0000,	// GPIO_READ
+	0x0000,	// GPIO_WRITE
+	0x03E8, // WDG_TIMEOUT
 };
+
+uint16_t prev_gpio_write_register;
+uint32_t wdg_time;
+uint8_t shutdown;
 
 /* USER CODE END PV */
 
@@ -106,64 +112,147 @@ int main(void)
   {
 	  Error_Handler();
   }
-
+  wdg_time = 0;
+  shutdown = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /* USER CODE END WHILE */
-	  if(modbus_rx())
+	  if(HAL_GPIO_ReadPin(MANUAL_GPIO_Port, MANUAL_Pin) == GPIO_PIN_SET)
 	  {
-		  int8_t status = 0;
-		  if(get_rx_buffer(0) == holding_register_database[0]) // Check Slave ID
+		  if(shutdown)
 		  {
-			  switch(get_rx_buffer(1))
-			  {
-				  case 0x03:
-				  {
-					  // Return holding registers
-					  status = return_holding_registers();
-					  break;
-				  }
-				  case 0x10:
-				  {
-					  // Write holding registers
-					  status = edit_multiple_registers();
-					  break;
-				  }
-				  default:
-				  {
-					  status = modbus_exception(MB_ILLEGAL_FUNCTION);
-					  break;
-				  }
-			  }
-			  if(status != 0)
-			  {
-				  // log error in a queue
-			  }
-		  }
-		  // Special case where you retrieve the modbus ID
-		  else if((get_rx_buffer(0) == 0xFF) && // modbus_id = 0xFF = 255
-			(get_rx_buffer(1) == 0x03) && // Function code = read_holding_registers
-			(((get_rx_buffer(2) << 8) | get_rx_buffer(3)) == 0x00) && // Address to read = 0
-			(((get_rx_buffer(4) << 8) | get_rx_buffer(5)) == 1)) // # of registers to read = 1
-		  {
+			  // Set all GPIO pins low
+			  HAL_GPIO_WritePin(RELAY_480_GPIO_Port, RELAY_480_Pin, GPIO_PIN_RESET);
+			  HAL_GPIO_WritePin(RELAY_480_GPIO_Port, RELAY_480_Pin, GPIO_PIN_RESET);
 
-			  status = return_holding_registers();
+			  // Carry the pin changes to the register database
+			  holding_register_database[GPIO_WRITE] = 0;
+			  prev_gpio_write_register = 0;
+
+			  // Restart the Modbus
+			  int8_t status = modbus_startup();
 			  if(status != 0)
 			  {
 				  // log error in a queue
 			  }
+			  status = modbus_set_rx();
+			  if(status != 0)
+			  {
+				  // log error in a queue
+			  }
+
+			  // Ensure this code only executes once
+			  shutdown = 0;
 		  }
-		  status = modbus_set_rx();
-		  if(status != 0)
+		  // Update the GPIO_READ register
+		  GPIO_PinState estop_sense = HAL_GPIO_ReadPin(ESTOP_SENSE_GPIO_Port, ESTOP_SENSE_Pin);
+		  GPIO_PinState sense_120 = HAL_GPIO_ReadPin(SENSE_120_GPIO_Port, SENSE_120_Pin);
+
+		  holding_register_database[GPIO_READ] = ((estop_sense << ESTOP_SENSE_POS) | (sense_120 << SENSE_120_POS));
+
+		  // Handle adjustment of the GPIO_WRITE pins
+		  if(prev_gpio_write_register != holding_register_database[GPIO_WRITE])
 		  {
-			  // log error in a queue
-			  //Error_Handler();
+			  if((prev_gpio_write_register & RELAY_120_MASK) != (holding_register_database[GPIO_WRITE] & RELAY_120_MASK))
+			  {
+				  HAL_GPIO_WritePin(RELAY_120_GPIO_Port, RELAY_120_Pin, (holding_register_database[GPIO_WRITE] & RELAY_120_MASK));
+			  }
+			  if((prev_gpio_write_register & RELAY_480_MASK) != (holding_register_database[GPIO_WRITE] & RELAY_480_MASK))
+			  {
+				  HAL_GPIO_WritePin(RELAY_480_GPIO_Port, RELAY_480_Pin, (holding_register_database[GPIO_WRITE] & RELAY_480_MASK));
+			  }
+			  prev_gpio_write_register = holding_register_database[GPIO_WRITE];
+		  }
+
+		  // Handle Watchdog Timeout
+		  if(HAL_GetTick() - wdg_time > (uint32_t)(holding_register_database[WDG_TIMEOUT]))
+		  {
+			  // Turn off the TBM
+			  HAL_GPIO_WritePin(RELAY_480_GPIO_Port, RELAY_480_Pin, GPIO_PIN_RESET);
+			  HAL_GPIO_WritePin(RELAY_120_GPIO_Port, RELAY_120_Pin, GPIO_PIN_RESET);
+
+			  // Update the holding register database
+			  holding_register_database[GPIO_WRITE] = 0;
+			  prev_gpio_write_register = 0;
+		  }
+
+		  if(modbus_rx())
+		  {
+			  int8_t status = 0;
+			  if(get_rx_buffer(0) == holding_register_database[0]) // Check Slave ID
+			  {
+				  switch(get_rx_buffer(1))
+				  {
+					  case 0x03:
+					  {
+						  // Return holding registers
+						  status = return_holding_registers();
+						  break;
+					  }
+					  case 0x10:
+					  {
+						  // Write holding registers
+						  status = edit_multiple_registers();
+						  break;
+					  }
+					  default:
+					  {
+						  status = modbus_exception(MB_ILLEGAL_FUNCTION);
+						  break;
+					  }
+				  }
+				  if(status != 0)
+				  {
+					  // log error in a queue
+				  }
+
+				  // Handle refreshing the watchdog timer
+				  wdg_time = HAL_GetTick();
+			  }
+			  // Special case where you retrieve the modbus ID
+			  else if((get_rx_buffer(0) == 0xFF) && // modbus_id = 0xFF = 255
+				(get_rx_buffer(1) == 0x03) && // Function code = read_holding_registers
+				(((get_rx_buffer(2) << 8) | get_rx_buffer(3)) == 0x00) && // Address to read = 0
+				(((get_rx_buffer(4) << 8) | get_rx_buffer(5)) == 1)) // # of registers to read = 1
+			  {
+				  status = return_holding_registers();
+				  if(status != 0)
+				  {
+					  // log error in a queue
+				  }
+			  }
+			  status = modbus_set_rx();
+			  if(status != 0)
+			  {
+				  // log error in a queue
+				  //Error_Handler();
+			  }
 		  }
 	  }
+	  else
+	  {
+		  if(!shutdown)
+		  {
+			  // Shutdown the Modbus
+			  int8_t status = modbus_shutdown();
+			  if(status != 0)
+			  {
+				  // log error in a queue
+			  }
+
+			  // Set all GPIO pins high
+			  HAL_GPIO_WritePin(RELAY_480_GPIO_Port, RELAY_480_Pin, GPIO_PIN_SET);
+			  HAL_GPIO_WritePin(RELAY_480_GPIO_Port, RELAY_480_Pin, GPIO_PIN_SET);
+
+			  // Ensure this code only executes once
+			  shutdown = 1;
+		  }
+	  }
+    /* USER CODE END WHILE */
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -274,6 +363,7 @@ static void MX_DMA_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
 /* USER CODE BEGIN MX_GPIO_Init_1 */
 /* USER CODE END MX_GPIO_Init_1 */
 
@@ -282,6 +372,28 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOF_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, RELAY_480_Pin|RELAY_120_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : SENSE_120_Pin ESTOP_SENSE_Pin */
+  GPIO_InitStruct.Pin = SENSE_120_Pin|ESTOP_SENSE_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : MANUAL_Pin */
+  GPIO_InitStruct.Pin = MANUAL_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(MANUAL_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : RELAY_480_Pin RELAY_120_Pin */
+  GPIO_InitStruct.Pin = RELAY_480_Pin|RELAY_120_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */

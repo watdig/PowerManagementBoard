@@ -51,6 +51,8 @@ int8_t modbus_exception(int8_t exception_code);
 int8_t modbus_send(uint8_t *data, uint8_t size);
 uint8_t modbus_rx();
 int8_t modbus_set_rx();
+int8_t modbus_shutdown();
+int8_t modbus_startup();
 void store_rx_buffer();
 
 
