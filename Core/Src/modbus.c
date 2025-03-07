@@ -559,6 +559,58 @@ void handle_range(uint16_t holding_register)
 			}
 			break;
 		}
+		case MB_TRANSMIT_TIMEOUT:
+		{
+			if(holding_register_database[holding_register] < 5)
+			{
+				holding_register_database[holding_register] = 5;
+			}
+			else if(holding_register_database[holding_register] > 1000)
+			{
+				holding_register_database[holding_register] = 1000;
+			}
+			break;
+		}
+		case MB_TRANSMIT_RETRIES:
+		{
+			if(holding_register_database[holding_register] > 5)
+			{
+				holding_register_database[holding_register] = 5;
+			}
+			break;
+		}
+		case MB_ERRORS:
+		{
+			if(holding_register_database[holding_register] > 0x3FF)
+			{
+				holding_register_database[holding_register] = 0x3FF;
+			}
+			break;
+		}
+		case I2C_ERRORS:
+		{
+			if(holding_register_database[holding_register] > 0x7F)
+			{
+				holding_register_database[holding_register] = 0x7F;
+			}
+			break;
+		}
+		case I2C_SHUTDOWN:
+		{
+			if(holding_register_database[holding_register] > 1)
+			{
+				holding_register_database[holding_register] = 1;
+			}
+			break;
+		}
+		case GPIO_WRITE:
+		{
+			if(holding_register_database[holding_register] > 0xF)
+			{
+				holding_register_database[holding_register] = 0xF;
+			}
+			break;
+		}
 		case WDG_TIMEOUT:
 		{
 			if(holding_register_database[holding_register] < 10)
