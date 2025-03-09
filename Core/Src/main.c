@@ -44,6 +44,7 @@
 
 UART_HandleTypeDef huart1;
 DMA_HandleTypeDef hdma_usart1_rx;
+DMA_HandleTypeDef hdma_usart1_tx;
 
 /* USER CODE BEGIN PV */
 
@@ -53,10 +54,6 @@ uint16_t holding_register_database[NUM_HOLDING_REGISTERS] = {
 	   100, // Timeout
 	     2, // MB Retry
 	0x0000, // MB_ERRORS
-
-	0x0000, // I2C_ERRORS
-	0x0000, // I2C_SHUTDOWN
-
     0x0000,	// GPIO_READ
 	0x0000,	// GPIO_WRITE
 	0x03E8	// WDG_TIME
@@ -90,7 +87,8 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-
+	int8_t modbus_status = HAL_OK;
+	uint8_t modbus_tx_len = 0;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -186,9 +184,9 @@ int main(void)
 			  prev_gpio_write_register = 0;
 		  }
 
+		  // Handle Modbus Communication
 		  if(modbus_rx())
 		  {
-			  int8_t status = 0;
 			  if(get_rx_buffer(0) == holding_register_database[0]) // Check Slave ID
 			  {
 				  switch(get_rx_buffer(1))
@@ -196,28 +194,25 @@ int main(void)
 					  case 0x03:
 					  {
 						  // Return holding registers
-						  status = return_holding_registers();
+						  modbus_status = return_holding_registers(&modbus_tx_len);
 						  break;
 					  }
 					  case 0x10:
 					  {
 						  // Write holding registers
-						  status = edit_multiple_registers();
+						  modbus_status = edit_multiple_registers(&modbus_tx_len);
 						  break;
 					  }
 					  default:
 					  {
-						  status = modbus_exception(MB_ILLEGAL_FUNCTION);
+						  modbus_status = modbus_exception(MB_ILLEGAL_FUNCTION);
 						  break;
 					  }
 				  }
-				  if(status != 0)
+				  if(modbus_status != 0)
 				  {
-					  // log error in a queue
+					  holding_register_database[MB_ERRORS] |= 1U << (modbus_status + (MB_FATAL_ERROR - 1));
 				  }
-
-				  // Handle refreshing the watchdog timer
-				  wdg_time = HAL_GetTick();
 			  }
 			  // Special case where you retrieve the modbus ID
 			  else if((get_rx_buffer(0) == 0xFF) && // modbus_id = 0xFF = 255
@@ -225,17 +220,62 @@ int main(void)
 				(((get_rx_buffer(2) << 8) | get_rx_buffer(3)) == 0x00) && // Address to read = 0
 				(((get_rx_buffer(4) << 8) | get_rx_buffer(5)) == 1)) // # of registers to read = 1
 			  {
-				  status = return_holding_registers();
-				  if(status != 0)
+
+				  modbus_status = return_holding_registers(&modbus_tx_len);
+				  if(modbus_status != 0)
 				  {
-					  // log error in a queue
+					  holding_register_database[MB_ERRORS] |= 1U << ((modbus_status - 1) + MB_FATAL_ERROR);
 				  }
 			  }
-			  status = modbus_set_rx();
-			  if(status != 0)
+			  modbus_status = modbus_set_rx();
+			  if(modbus_status != 0)
 			  {
-				  // log error in a queue
-				  //Error_Handler();
+				  holding_register_database[MB_ERRORS] |= 1U << ((modbus_status - 1) + MB_FATAL_ERROR);
+			  }
+		  }
+		  modbus_status = monitor_modbus();
+		  if(modbus_status != HAL_OK && modbus_status != HAL_BUSY)
+		  {
+			  switch(modbus_status)
+			  {
+				  case MB_TX_TIMEOUT:
+				  {
+					  for(uint8_t i = 0; i < holding_register_database[MB_TRANSMIT_RETRIES]; i++)
+					  {
+						  modbus_status = modbus_send(modbus_tx_len);
+						  if(modbus_status != HAL_OK)
+						  {
+							  holding_register_database[MB_ERRORS] |= 1U << ((modbus_status - 1) + MB_FATAL_ERROR);
+						  }
+					  }
+					  break;
+				  }
+				  case MB_RX_TIMEOUT:
+				  {
+					  // Error only relates to Modbus Master Nodes
+					  break;
+				  }
+				  case MB_UART_ERROR:
+				  {
+					  modbus_status = modbus_set_rx();
+					  if(modbus_status != 0)
+					  {
+						  holding_register_database[MB_ERRORS] |= 1U << ((modbus_status - 1) + MB_FATAL_ERROR);
+					  }
+					  break;
+				  }
+				  case MB_FATAL_ERROR:
+				  {
+					  while(modbus_status != HAL_OK)
+					  {
+						  modbus_status = modbus_reset();
+					  }
+					  break;
+				  }
+				  default:
+				  {
+					  // Unknown error
+				  }
 			  }
 		  }
 	  }
@@ -360,6 +400,9 @@ static void MX_DMA_Init(void)
   /* DMA1_Channel1_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
+  /* DMA1_Channel2_3_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel2_3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel2_3_IRQn);
 
 }
 

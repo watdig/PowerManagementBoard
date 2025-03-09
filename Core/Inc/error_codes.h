@@ -29,5 +29,15 @@
 #define MB_SLAVE_ID_MISMATCH 		0x0F
 #define MB_FUNCTION_MISMATCH		0x10
 #define MB_INVALID_CRC 				0x11
+#define MB_TX_TIMEOUT				0x12
+#define MB_RX_TIMEOUT				0x13
+#define MB_UART_ERROR				0x14
+#define MB_FATAL_ERROR				0x15
+
+// I2C Error Codes
+#define I2C_TX_TIMEOUT				0x16
+#define I2C_RX_TIMEOUT				0x17
+#define I2C_ERROR					0x18
+#define I2C_FATAL_ERROR				0x19
 
 #endif /* APPLICATION_USER_CORE_CUSTOM_LAYERS_ERROR_CODES_H_ */

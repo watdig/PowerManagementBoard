@@ -60,8 +60,8 @@ all: main-build
 main-build: PowerManagementBoard.elf secondary-outputs
 
 # Tool invocations
-PowerManagementBoard.elf PowerManagementBoard.map: $(OBJS) $(USER_OBJS) C:\Users\Dell\Documents\WLoo\Design\ Teams\Watdig\PowerManagementBoard\STM32C071CBTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "PowerManagementBoard.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"C:\Users\Dell\Documents\WLoo\Design Teams\Watdig\PowerManagementBoard\STM32C071CBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="PowerManagementBoard.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+PowerManagementBoard.elf PowerManagementBoard.map: $(OBJS) $(USER_OBJS) C:\STM32CubeIDE\WatDig\PowerManagementBoard\STM32C071CBTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "PowerManagementBoard.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"C:\STM32CubeIDE\WatDig\PowerManagementBoard\STM32C071CBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="PowerManagementBoard.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
