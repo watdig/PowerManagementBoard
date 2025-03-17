@@ -49,7 +49,7 @@ DMA_HandleTypeDef hdma_usart1_tx;
 /* USER CODE BEGIN PV */
 
 uint16_t holding_register_database[NUM_HOLDING_REGISTERS] = {
-    0x0001, // MODBUS_ID
+    0x0007, // MODBUS_ID
     0x0003, // MB_BAUD_RATE
 	   100, // Timeout
 	     2, // MB Retry
@@ -187,7 +187,7 @@ int main(void)
 		  // Handle Modbus Communication
 		  if(modbus_rx())
 		  {
-			  if(get_rx_buffer(0) == holding_register_database[0]) // Check Slave ID
+			  if(get_rx_buffer(0) == holding_register_database[MODBUS_ID]) // Check Slave ID
 			  {
 				  switch(get_rx_buffer(1))
 				  {

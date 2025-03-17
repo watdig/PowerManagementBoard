@@ -745,7 +745,7 @@ int main(void)
  8000574:	d100      	bne.n	8000578 <main+0x184>
  8000576:	e091      	b.n	800069c <main+0x2a8>
 		  {
-			  if(get_rx_buffer(0) == holding_register_database[0]) // Check Slave ID
+			  if(get_rx_buffer(0) == holding_register_database[MODBUS_ID]) // Check Slave ID
  8000578:	2000      	movs	r0, #0
  800057a:	f000 ffeb 	bl	8001554 <get_rx_buffer>
  800057e:	0003      	movs	r3, r0
@@ -2175,7 +2175,7 @@ int8_t edit_multiple_registers(uint8_t *tx_len)
  8000e0e:	881b      	ldrh	r3, [r3, #0]
  8000e10:	2b04      	cmp	r3, #4
  8000e12:	d903      	bls.n	8000e1c <edit_multiple_registers+0xb8>
-		((last_register_address >= GPIO_READ) && (last_register_address <= GPIO_READ)) ||
+		 ((last_register_address >= GPIO_READ) && (last_register_address <= GPIO_READ)) ||
  8000e14:	18bb      	adds	r3, r7, r2
  8000e16:	881b      	ldrh	r3, [r3, #0]
  8000e18:	2b05      	cmp	r3, #5
@@ -2185,7 +2185,7 @@ int8_t edit_multiple_registers(uint8_t *tx_len)
  8000e20:	881b      	ldrh	r3, [r3, #0]
  8000e22:	2b04      	cmp	r3, #4
  8000e24:	d809      	bhi.n	8000e3a <edit_multiple_registers+0xd6>
-		((first_register_address < GPIO_READ  && last_register_address > GPIO_READ)))
+		 ((first_register_address < GPIO_READ  && last_register_address > GPIO_READ)))
  8000e26:	2310      	movs	r3, #16
  8000e28:	18fb      	adds	r3, r7, r3
  8000e2a:	881b      	ldrh	r3, [r3, #0]
