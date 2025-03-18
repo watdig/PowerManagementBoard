@@ -23,8 +23,8 @@
 #define MB_SUCCESS 			0x00
 typedef enum baud_rate_e
 {
-	// Most sensors are capable of 2400 baud, however the STM32 is limited between 2442 bps - 10 000 000 bps
-	BAUD_RATE_4800 = 2,
+	BAUD_RATE_2400 = 1,
+	BAUD_RATE_4800,
 	BAUD_RATE_9600,
 	BAUD_RATE_19200,
 	BAUD_RATE_38400,

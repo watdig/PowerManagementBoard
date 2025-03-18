@@ -17,7 +17,7 @@ logging.getLogger('pymodbus').setLevel(logging.ERROR)
 
 # Connection parameters
 PORT = 'COM3'
-BAUDRATE = 9600
+BAUDRATE = 115200
 PARITY = 'N'
 UNIT_ID = 1
 STOPBITS = 1

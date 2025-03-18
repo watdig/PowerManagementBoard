@@ -18,16 +18,13 @@
 #define MODBUS_RX_BUFFER_SIZE  256
 #define high_byte(value) ((value >> 8) & 0xFF)
 #define low_byte(value) (value & 0xFF)
-#define word(value1, value2) (((value1 >> 8) & 0xFF) | (value2 & 0xFF))
-
 
 // Buffer variables
 uint8_t modbus_rx_buffer[MODBUS_RX_BUFFER_SIZE];
 uint8_t modbus_tx_buffer[MODBUS_TX_BUFFER_SIZE];
-uint8_t rx_chunk[MODBUS_RX_BUFFER_SIZE - 6];
 #ifdef MB_MASTER
-uint16_t tx_buffer[TX_BUFFER_SIZE]; // Master
-uint16_t response_buffer[RX_BUFFER_SIZE]; // Master
+uint16_t tx_buffer[TX_BUFFER_SIZE];
+uint16_t response_buffer[RX_BUFFER_SIZE];
 
 // Master Response variables
 uint8_t target_id = 0;
@@ -43,9 +40,6 @@ uint32_t tx_time = 0;
 volatile uint32_t chunk_time = 0;
 
 // Interrupt Handling Variables
-volatile uint16_t start_index = 0;
-volatile uint16_t chunk_start_i = 0;
-volatile uint16_t chunk_end_i = 0;
 volatile uint16_t modbus_header = 1;
 volatile uint8_t uart_rx_int = 0;
 volatile uint8_t uart_tx_int = 1;
@@ -53,13 +47,9 @@ volatile uint8_t uart_err_int = 0;
 
 // External Variables
 extern UART_HandleTypeDef huart1;
-extern DMA_HandleTypeDef hdma_adc1;
-extern DMA_HandleTypeDef hdma_i2c1_rx;
 extern DMA_HandleTypeDef hdma_usart1_rx;
 extern DMA_HandleTypeDef hdma_usart1_tx;
 extern uint16_t holding_register_database[];
-extern uint8_t low_half_safe;
-extern volatile uint8_t i2c_uart_rx_int;
 
 // Private Functions
 uint16_t crc_16(uint8_t *data, uint8_t size);
@@ -131,57 +121,30 @@ static const uint8_t table_crc_lo[] = {
  */
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 {
-	if(huart->Instance == USART1)
+	if(modbus_header)
 	{
-		chunk_start_i = chunk_end_i;  // Update the last position before copying new data
+		// Log the time for chunk miss error handling
+		chunk_time = HAL_GetTick();
+		modbus_header = 0;
 
+		// Setup the DMA to receive the # message bytes + crc + 1 in the event that the # bytes is in the message
+		HAL_UARTEx_ReceiveToIdle_DMA(&huart1, &modbus_rx_buffer[6], (uint16_t)(((modbus_rx_buffer[4] << 8) | modbus_rx_buffer[5])*2 + 2 + 1));
+		__HAL_DMA_DISABLE_IT(huart1.hdmarx, DMA_IT_HT);
+	}
+	else
+	{
 		/*
-		 * If the data is large and it is about to exceed the buffer size, we have to route it to the start of the buffer
-		 * This is to maintain the circular buffer
-		 * The old data in the main buffer will be overlapped
+		 * This is where the message officially completes being received
+		 * For Masters: Don't set up a reception, modbus stays in idle until you transmit a command again
+		 * For Slaves: Don't set up reception since you will need to transmit a response first
+		 * Use modbus_set_rx(); as the user to re-enable receive mode
 		 */
-		if (chunk_start_i + Size > MODBUS_RX_BUFFER_SIZE)  // If the current position + new data size is greater than the main buffer
-		{
-			uint16_t datatocopy = MODBUS_RX_BUFFER_SIZE - chunk_start_i;  // find out how much space is left in the main buffer
-			memcpy ((uint8_t *)(modbus_rx_buffer + chunk_start_i), rx_chunk, datatocopy);  // copy data in that remaining space
-
-			chunk_end_i = (Size - datatocopy);  // update the position
-			memcpy ((uint8_t *)modbus_rx_buffer, (uint8_t *)(rx_chunk + datatocopy), chunk_end_i);  // copy the remaining data
-		}
-
-		/*
-		 * If the current position + new data size is less than the main buffer
-		 * we will simply copy the data into the buffer and update the position
-		 */
-		else
-		{
-			memcpy ((uint8_t *)(modbus_rx_buffer + chunk_start_i), rx_chunk, Size);
-			chunk_end_i = Size + chunk_start_i;
-		}
-
-		if(modbus_header)
-		{
-			// Log the time for chunk miss error handling
-			chunk_time = HAL_GetTick();
-
-			start_index = chunk_start_i;
-			modbus_header = 0;
-
-			// Setup the DMA to receive the # message bytes + crc + 1 in the event that the # bytes is in the message
-			HAL_UARTEx_ReceiveToIdle_DMA(&huart1, rx_chunk, (uint16_t)(((rx_chunk[4] << 8) | rx_chunk[5])*2 + 2 + 1));
-			__HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
-		}
-		else
-		{
-			/*
-			 * This is where the message officially completes being received
-			 * For Masters: Don't set up a reception, modbus stays in idle until you transmit a command again
-			 * For Slaves: Don't set up reception since you will need to transmit a response first
-			 * Use modbus_set_rx(); as the user to re-enable receive mode
-			 */
-			modbus_header = 1;
-			uart_rx_int = 1;
-		}
+		modbus_header = 1;
+		uart_rx_int = 1;
+#ifdef MB_SLAVE
+		HAL_UARTEx_ReceiveToIdle_DMA(&huart1, modbus_rx_buffer, 6);
+		__HAL_DMA_DISABLE_IT(huart1.hdmarx, DMA_IT_HT);
+#endif
 	}
 }
 
@@ -382,7 +345,6 @@ int8_t return_holding_registers(uint8_t* tx_len)
 	}
 
 	// Return register values
-
 	modbus_tx_buffer[0] = get_rx_buffer(0); // Append Slave id
 	modbus_tx_buffer[1] = get_rx_buffer(1); // Append Function Code
 	modbus_tx_buffer[2] = num_registers * 2; // Append number of bytes
@@ -401,6 +363,7 @@ int8_t return_holding_registers(uint8_t* tx_len)
 int8_t edit_multiple_registers(uint8_t *tx_len)
 {
 	(*tx_len) = 0;
+
 	// Handle Error Checking
 	uint16_t first_register_address = (get_rx_buffer(2) << 8) | get_rx_buffer(3);
 
@@ -541,7 +504,7 @@ int8_t modbus_send(uint8_t size)
 	uart_tx_int = 0; // This will enable tx timeout monitoring
 	tx_time = HAL_GetTick();
 	status = HAL_UART_Transmit_DMA(&huart1, modbus_tx_buffer, size + 2);
-	__HAL_DMA_DISABLE_IT(&hdma_usart1_tx, DMA_IT_HT);
+	__HAL_DMA_DISABLE_IT(huart1.hdmatx, DMA_IT_HT);
 	return status;
 }
 
@@ -566,8 +529,8 @@ int8_t modbus_reset()
 
 int8_t modbus_set_rx()
 {
-	int8_t status = HAL_UARTEx_ReceiveToIdle_DMA(&huart1, rx_chunk, 6);
-	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
+	int8_t status = HAL_UARTEx_ReceiveToIdle_DMA(&huart1, modbus_rx_buffer, 6);
+	__HAL_DMA_DISABLE_IT(huart1.hdmarx, DMA_IT_HT);
 
 	return status;
 }
@@ -689,6 +652,11 @@ int8_t modbus_change_baud_rate()
 
 	switch(holding_register_database[MB_BAUD_RATE])
 	{
+		case BAUD_RATE_2400:
+		{
+			huart1.Init.BaudRate = 2400;
+			break;
+		}
 		case BAUD_RATE_4800:
 		{
 			huart1.Init.BaudRate = 4800;
@@ -791,11 +759,9 @@ int8_t modbus_get_baud_rate(uint8_t* baud_rate)
 // Low Level Functions -------------------------------------------------------------------------
 uint8_t get_rx_buffer(uint8_t index)
 {
-	if (index < MODBUS_RX_BUFFER_SIZE - 1)
+	if (index < MODBUS_RX_BUFFER_SIZE)
 	{
-		return ((start_index + index) > (MODBUS_RX_BUFFER_SIZE - 1))?
-				modbus_rx_buffer[(start_index + index) - MODBUS_RX_BUFFER_SIZE] :
-				modbus_rx_buffer[start_index + index];
+		return modbus_rx_buffer[index];
 	}
 	return 0xFF;
 }

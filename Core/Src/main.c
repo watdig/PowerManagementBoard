@@ -50,7 +50,7 @@ DMA_HandleTypeDef hdma_usart1_tx;
 
 uint16_t holding_register_database[NUM_HOLDING_REGISTERS] = {
     0x0007, // MODBUS_ID
-    0x0003, // MB_BAUD_RATE
+    0x0007, // MB_BAUD_RATE
 	   100, // Timeout
 	     2, // MB Retry
 	0x0000, // MB_ERRORS
@@ -138,15 +138,15 @@ int main(void)
 			  prev_gpio_write_register = 0;
 
 			  // Restart the Modbus
-			  int8_t status = modbus_startup();
-			  if(status != 0)
+			  modbus_status = modbus_startup();
+			  if(modbus_status != 0)
 			  {
-				  // log error in a queue
+				  holding_register_database[MB_ERRORS] |= 1U << ((modbus_status) + (MB_FATAL_ERROR - RANGE_ERROR));
 			  }
-			  status = modbus_set_rx();
-			  if(status != 0)
+			  modbus_status = modbus_set_rx();
+			  if(modbus_status != 0)
 			  {
-				  // log error in a queue
+				  holding_register_database[MB_ERRORS] |= 1U << ((modbus_status) + (MB_FATAL_ERROR - RANGE_ERROR));
 			  }
 
 			  // Ensure this code only executes once
@@ -211,7 +211,7 @@ int main(void)
 				  }
 				  if(modbus_status != 0)
 				  {
-					  holding_register_database[MB_ERRORS] |= 1U << (modbus_status + (MB_FATAL_ERROR - 1));
+					  holding_register_database[MB_ERRORS] |= 1U << ((modbus_status) + (MB_FATAL_ERROR - RANGE_ERROR));
 				  }
 			  }
 			  // Special case where you retrieve the modbus ID
@@ -224,13 +224,8 @@ int main(void)
 				  modbus_status = return_holding_registers(&modbus_tx_len);
 				  if(modbus_status != 0)
 				  {
-					  holding_register_database[MB_ERRORS] |= 1U << ((modbus_status - 1) + MB_FATAL_ERROR);
+					  holding_register_database[MB_ERRORS] |= 1U << ((modbus_status) + (MB_FATAL_ERROR - RANGE_ERROR));
 				  }
-			  }
-			  modbus_status = modbus_set_rx();
-			  if(modbus_status != 0)
-			  {
-				  holding_register_database[MB_ERRORS] |= 1U << ((modbus_status - 1) + MB_FATAL_ERROR);
 			  }
 		  }
 		  modbus_status = monitor_modbus();
@@ -245,7 +240,7 @@ int main(void)
 						  modbus_status = modbus_send(modbus_tx_len);
 						  if(modbus_status != HAL_OK)
 						  {
-							  holding_register_database[MB_ERRORS] |= 1U << ((modbus_status - 1) + MB_FATAL_ERROR);
+							  holding_register_database[MB_ERRORS] |= 1U << ((modbus_status) + (MB_FATAL_ERROR - RANGE_ERROR));
 						  }
 					  }
 					  break;
@@ -260,7 +255,7 @@ int main(void)
 					  modbus_status = modbus_set_rx();
 					  if(modbus_status != 0)
 					  {
-						  holding_register_database[MB_ERRORS] |= 1U << ((modbus_status - 1) + MB_FATAL_ERROR);
+						  holding_register_database[MB_ERRORS] |= 1U << ((modbus_status) + (MB_FATAL_ERROR - RANGE_ERROR));
 					  }
 					  break;
 				  }
@@ -269,6 +264,11 @@ int main(void)
 					  while(modbus_status != HAL_OK)
 					  {
 						  modbus_status = modbus_reset();
+					  }
+					  modbus_status = modbus_set_rx();
+					  if(modbus_status != 0)
+					  {
+						  holding_register_database[MB_ERRORS] |= 1U << ((modbus_status) + (MB_FATAL_ERROR - RANGE_ERROR));
 					  }
 					  break;
 				  }
@@ -355,7 +355,7 @@ static void MX_USART1_UART_Init(void)
 
   /* USER CODE END USART1_Init 1 */
   huart1.Instance = USART1;
-  huart1.Init.BaudRate = 9600;
+  huart1.Init.BaudRate = 115200;
   huart1.Init.WordLength = UART_WORDLENGTH_8B;
   huart1.Init.StopBits = UART_STOPBITS_1;
   huart1.Init.Parity = UART_PARITY_NONE;
