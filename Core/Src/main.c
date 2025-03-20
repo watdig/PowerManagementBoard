@@ -292,7 +292,7 @@ int main(void)
 
 			  // Set all GPIO pins high
 			  HAL_GPIO_WritePin(RELAY_480_GPIO_Port, RELAY_480_Pin, GPIO_PIN_SET);
-			  HAL_GPIO_WritePin(RELAY_480_GPIO_Port, RELAY_480_Pin, GPIO_PIN_SET);
+			  HAL_GPIO_WritePin(RELAY_120_GPIO_Port, RELAY_120_Pin, GPIO_PIN_SET);
 
 			  // Ensure this code only executes once
 			  shutdown = 1;
