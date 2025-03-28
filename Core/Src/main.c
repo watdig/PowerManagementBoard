@@ -50,7 +50,7 @@ DMA_HandleTypeDef hdma_usart1_tx;
 
 uint16_t holding_register_database[NUM_HOLDING_REGISTERS] = {
     0x0007, // MODBUS_ID
-    0x0007, // MB_BAUD_RATE
+    0x0003, // MB_BAUD_RATE
 	   100, // Timeout
 	     2, // MB Retry
 	0x0000, // MB_ERRORS
@@ -356,7 +356,7 @@ static void MX_USART1_UART_Init(void)
 
   /* USER CODE END USART1_Init 1 */
   huart1.Instance = USART1;
-  huart1.Init.BaudRate = 115200;
+  huart1.Init.BaudRate = 9600;
   huart1.Init.WordLength = UART_WORDLENGTH_8B;
   huart1.Init.StopBits = UART_STOPBITS_1;
   huart1.Init.Parity = UART_PARITY_NONE;
