@@ -170,6 +170,7 @@ int main(void)
 				  HAL_GPIO_WritePin(RELAY_480_GPIO_Port, RELAY_480_Pin, (holding_register_database[GPIO_WRITE] & RELAY_480_MASK));
 			  }
 			  prev_gpio_write_register = holding_register_database[GPIO_WRITE];
+			  wdg_time = HAL_GetTick();
 		  }
 
 		  // Handle Watchdog Timeout
@@ -189,6 +190,7 @@ int main(void)
 		  {
 			  if(get_rx_buffer(0) == holding_register_database[MODBUS_ID]) // Check Slave ID
 			  {
+				  wdg_time = HAL_GetTick();
 				  switch(get_rx_buffer(1))
 				  {
 					  case 0x03:
@@ -220,7 +222,6 @@ int main(void)
 				(((get_rx_buffer(2) << 8) | get_rx_buffer(3)) == 0x00) && // Address to read = 0
 				(((get_rx_buffer(4) << 8) | get_rx_buffer(5)) == 1)) // # of registers to read = 1
 			  {
-
 				  modbus_status = return_holding_registers(&modbus_tx_len);
 				  if(modbus_status != 0)
 				  {
