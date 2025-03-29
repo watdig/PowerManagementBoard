@@ -551,18 +551,18 @@ int main(void)
  800044a:	d02d      	beq.n	80004a8 <main+0xb4>
 		  {
 			  // Set all GPIO pins low
-			  HAL_GPIO_WritePin(RELAY_120_GPIO_Port, RELAY_120_Pin, GPIO_PIN_RESET);
- 800044c:	2380      	movs	r3, #128	@ 0x80
- 800044e:	005b      	lsls	r3, r3, #1
- 8000450:	48c7      	ldr	r0, [pc, #796]	@ (8000770 <main+0x37c>)
- 8000452:	2200      	movs	r2, #0
- 8000454:	0019      	movs	r1, r3
- 8000456:	f002 fa64 	bl	8002922 <HAL_GPIO_WritePin>
 			  HAL_GPIO_WritePin(RELAY_480_GPIO_Port, RELAY_480_Pin, GPIO_PIN_RESET);
- 800045a:	4bc5      	ldr	r3, [pc, #788]	@ (8000770 <main+0x37c>)
- 800045c:	2200      	movs	r2, #0
- 800045e:	2180      	movs	r1, #128	@ 0x80
- 8000460:	0018      	movs	r0, r3
+ 800044c:	4bc8      	ldr	r3, [pc, #800]	@ (8000770 <main+0x37c>)
+ 800044e:	2200      	movs	r2, #0
+ 8000450:	2180      	movs	r1, #128	@ 0x80
+ 8000452:	0018      	movs	r0, r3
+ 8000454:	f002 fa65 	bl	8002922 <HAL_GPIO_WritePin>
+			  HAL_GPIO_WritePin(RELAY_120_GPIO_Port, RELAY_120_Pin, GPIO_PIN_RESET);
+ 8000458:	2380      	movs	r3, #128	@ 0x80
+ 800045a:	005b      	lsls	r3, r3, #1
+ 800045c:	48c4      	ldr	r0, [pc, #784]	@ (8000770 <main+0x37c>)
+ 800045e:	2200      	movs	r2, #0
+ 8000460:	0019      	movs	r1, r3
  8000462:	f002 fa5e 	bl	8002922 <HAL_GPIO_WritePin>
 
 			  // Carry the pin changes to the register database
