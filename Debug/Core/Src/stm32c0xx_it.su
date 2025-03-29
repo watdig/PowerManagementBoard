@@ -1,3 +1,4 @@
+../Drivers/CMSIS/Include/core_cm0plus.h:987:34:__NVIC_SystemReset	8	static,ignoring_inline_asm
 ../Core/Src/stm32c0xx_it.c:71:6:NMI_Handler	8	static
 ../Core/Src/stm32c0xx_it.c:86:6:HardFault_Handler	8	static
 ../Core/Src/stm32c0xx_it.c:101:6:SVC_Handler	8	static
