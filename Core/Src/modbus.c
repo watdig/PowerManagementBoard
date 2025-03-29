@@ -620,6 +620,7 @@ int8_t monitor_modbus()
 
 int8_t modbus_startup()
 {
+	uart_err_int = 0;
 	return modbus_reset();
 }
 
