@@ -130,7 +130,7 @@ int main(void)
 		  if(shutdown)
 		  {
 			  // Set all GPIO pins low
-			  HAL_GPIO_WritePin(RELAY_480_GPIO_Port, RELAY_480_Pin, GPIO_PIN_RESET);
+			  HAL_GPIO_WritePin(RELAY_120_GPIO_Port, RELAY_120_Pin, GPIO_PIN_RESET);
 			  HAL_GPIO_WritePin(RELAY_480_GPIO_Port, RELAY_480_Pin, GPIO_PIN_RESET);
 
 			  // Carry the pin changes to the register database

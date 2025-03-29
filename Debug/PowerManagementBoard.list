@@ -548,504 +548,504 @@ int main(void)
  8000444:	4bc9      	ldr	r3, [pc, #804]	@ (800076c <main+0x378>)
  8000446:	781b      	ldrb	r3, [r3, #0]
  8000448:	2b00      	cmp	r3, #0
- 800044a:	d02c      	beq.n	80004a6 <main+0xb2>
+ 800044a:	d02d      	beq.n	80004a8 <main+0xb4>
 		  {
 			  // Set all GPIO pins low
+			  HAL_GPIO_WritePin(RELAY_120_GPIO_Port, RELAY_120_Pin, GPIO_PIN_RESET);
+ 800044c:	2380      	movs	r3, #128	@ 0x80
+ 800044e:	005b      	lsls	r3, r3, #1
+ 8000450:	48c7      	ldr	r0, [pc, #796]	@ (8000770 <main+0x37c>)
+ 8000452:	2200      	movs	r2, #0
+ 8000454:	0019      	movs	r1, r3
+ 8000456:	f002 fa64 	bl	8002922 <HAL_GPIO_WritePin>
 			  HAL_GPIO_WritePin(RELAY_480_GPIO_Port, RELAY_480_Pin, GPIO_PIN_RESET);
- 800044c:	4bc8      	ldr	r3, [pc, #800]	@ (8000770 <main+0x37c>)
- 800044e:	2200      	movs	r2, #0
- 8000450:	2180      	movs	r1, #128	@ 0x80
- 8000452:	0018      	movs	r0, r3
- 8000454:	f002 fa65 	bl	8002922 <HAL_GPIO_WritePin>
-			  HAL_GPIO_WritePin(RELAY_480_GPIO_Port, RELAY_480_Pin, GPIO_PIN_RESET);
- 8000458:	4bc5      	ldr	r3, [pc, #788]	@ (8000770 <main+0x37c>)
- 800045a:	2200      	movs	r2, #0
- 800045c:	2180      	movs	r1, #128	@ 0x80
- 800045e:	0018      	movs	r0, r3
- 8000460:	f002 fa5f 	bl	8002922 <HAL_GPIO_WritePin>
+ 800045a:	4bc5      	ldr	r3, [pc, #788]	@ (8000770 <main+0x37c>)
+ 800045c:	2200      	movs	r2, #0
+ 800045e:	2180      	movs	r1, #128	@ 0x80
+ 8000460:	0018      	movs	r0, r3
+ 8000462:	f002 fa5e 	bl	8002922 <HAL_GPIO_WritePin>
 
 			  // Carry the pin changes to the register database
 			  holding_register_database[GPIO_WRITE] = 0;
- 8000464:	4bc3      	ldr	r3, [pc, #780]	@ (8000774 <main+0x380>)
- 8000466:	2200      	movs	r2, #0
- 8000468:	819a      	strh	r2, [r3, #12]
+ 8000466:	4bc3      	ldr	r3, [pc, #780]	@ (8000774 <main+0x380>)
+ 8000468:	2200      	movs	r2, #0
+ 800046a:	819a      	strh	r2, [r3, #12]
 			  prev_gpio_write_register = 0;
- 800046a:	4bc3      	ldr	r3, [pc, #780]	@ (8000778 <main+0x384>)
- 800046c:	2200      	movs	r2, #0
- 800046e:	801a      	strh	r2, [r3, #0]
+ 800046c:	4bc2      	ldr	r3, [pc, #776]	@ (8000778 <main+0x384>)
+ 800046e:	2200      	movs	r2, #0
+ 8000470:	801a      	strh	r2, [r3, #0]
 
 			  // Restart the Modbus
 			  modbus_status = modbus_startup();
- 8000470:	1dfc      	adds	r4, r7, #7
- 8000472:	f000 ff5b 	bl	800132c <modbus_startup>
- 8000476:	0003      	movs	r3, r0
- 8000478:	7023      	strb	r3, [r4, #0]
+ 8000472:	1dfc      	adds	r4, r7, #7
+ 8000474:	f000 ff5a 	bl	800132c <modbus_startup>
+ 8000478:	0003      	movs	r3, r0
+ 800047a:	7023      	strb	r3, [r4, #0]
 			  if(modbus_status != 0)
- 800047a:	1dfb      	adds	r3, r7, #7
- 800047c:	781b      	ldrb	r3, [r3, #0]
- 800047e:	b25b      	sxtb	r3, r3
- 8000480:	2b00      	cmp	r3, #0
- 8000482:	d00d      	beq.n	80004a0 <main+0xac>
+ 800047c:	1dfb      	adds	r3, r7, #7
+ 800047e:	781b      	ldrb	r3, [r3, #0]
+ 8000480:	b25b      	sxtb	r3, r3
+ 8000482:	2b00      	cmp	r3, #0
+ 8000484:	d00d      	beq.n	80004a2 <main+0xae>
 			  {
 				  holding_register_database[MB_ERRORS] |= 1U << ((modbus_status) + (MB_FATAL_ERROR - RANGE_ERROR));
- 8000484:	4bbb      	ldr	r3, [pc, #748]	@ (8000774 <main+0x380>)
- 8000486:	891a      	ldrh	r2, [r3, #8]
- 8000488:	1dfb      	adds	r3, r7, #7
- 800048a:	781b      	ldrb	r3, [r3, #0]
- 800048c:	b25b      	sxtb	r3, r3
- 800048e:	3307      	adds	r3, #7
- 8000490:	2101      	movs	r1, #1
- 8000492:	4099      	lsls	r1, r3
- 8000494:	000b      	movs	r3, r1
- 8000496:	b29b      	uxth	r3, r3
- 8000498:	4313      	orrs	r3, r2
- 800049a:	b29a      	uxth	r2, r3
- 800049c:	4bb5      	ldr	r3, [pc, #724]	@ (8000774 <main+0x380>)
- 800049e:	811a      	strh	r2, [r3, #8]
+ 8000486:	4bbb      	ldr	r3, [pc, #748]	@ (8000774 <main+0x380>)
+ 8000488:	891a      	ldrh	r2, [r3, #8]
+ 800048a:	1dfb      	adds	r3, r7, #7
+ 800048c:	781b      	ldrb	r3, [r3, #0]
+ 800048e:	b25b      	sxtb	r3, r3
+ 8000490:	3307      	adds	r3, #7
+ 8000492:	2101      	movs	r1, #1
+ 8000494:	4099      	lsls	r1, r3
+ 8000496:	000b      	movs	r3, r1
+ 8000498:	b29b      	uxth	r3, r3
+ 800049a:	4313      	orrs	r3, r2
+ 800049c:	b29a      	uxth	r2, r3
+ 800049e:	4bb5      	ldr	r3, [pc, #724]	@ (8000774 <main+0x380>)
+ 80004a0:	811a      	strh	r2, [r3, #8]
 			  }
 
 			  // Ensure this code only executes once
 			  shutdown = 0;
- 80004a0:	4bb2      	ldr	r3, [pc, #712]	@ (800076c <main+0x378>)
- 80004a2:	2200      	movs	r2, #0
- 80004a4:	701a      	strb	r2, [r3, #0]
+ 80004a2:	4bb2      	ldr	r3, [pc, #712]	@ (800076c <main+0x378>)
+ 80004a4:	2200      	movs	r2, #0
+ 80004a6:	701a      	strb	r2, [r3, #0]
 		  }
 		  // Update the GPIO_READ register
 		  GPIO_PinState estop_sense = HAL_GPIO_ReadPin(ESTOP_SENSE_GPIO_Port, ESTOP_SENSE_Pin);
- 80004a6:	1d3c      	adds	r4, r7, #4
- 80004a8:	2380      	movs	r3, #128	@ 0x80
- 80004aa:	009b      	lsls	r3, r3, #2
- 80004ac:	4ab0      	ldr	r2, [pc, #704]	@ (8000770 <main+0x37c>)
- 80004ae:	0019      	movs	r1, r3
- 80004b0:	0010      	movs	r0, r2
- 80004b2:	f002 fa19 	bl	80028e8 <HAL_GPIO_ReadPin>
- 80004b6:	0003      	movs	r3, r0
- 80004b8:	7023      	strb	r3, [r4, #0]
+ 80004a8:	1d3c      	adds	r4, r7, #4
+ 80004aa:	2380      	movs	r3, #128	@ 0x80
+ 80004ac:	009b      	lsls	r3, r3, #2
+ 80004ae:	4ab0      	ldr	r2, [pc, #704]	@ (8000770 <main+0x37c>)
+ 80004b0:	0019      	movs	r1, r3
+ 80004b2:	0010      	movs	r0, r2
+ 80004b4:	f002 fa18 	bl	80028e8 <HAL_GPIO_ReadPin>
+ 80004b8:	0003      	movs	r3, r0
+ 80004ba:	7023      	strb	r3, [r4, #0]
 		  GPIO_PinState sense_120 = HAL_GPIO_ReadPin(SENSE_120_GPIO_Port, SENSE_120_Pin);
- 80004ba:	1cfc      	adds	r4, r7, #3
- 80004bc:	2380      	movs	r3, #128	@ 0x80
- 80004be:	021b      	lsls	r3, r3, #8
- 80004c0:	4aab      	ldr	r2, [pc, #684]	@ (8000770 <main+0x37c>)
- 80004c2:	0019      	movs	r1, r3
- 80004c4:	0010      	movs	r0, r2
- 80004c6:	f002 fa0f 	bl	80028e8 <HAL_GPIO_ReadPin>
- 80004ca:	0003      	movs	r3, r0
- 80004cc:	7023      	strb	r3, [r4, #0]
+ 80004bc:	1cfc      	adds	r4, r7, #3
+ 80004be:	2380      	movs	r3, #128	@ 0x80
+ 80004c0:	021b      	lsls	r3, r3, #8
+ 80004c2:	4aab      	ldr	r2, [pc, #684]	@ (8000770 <main+0x37c>)
+ 80004c4:	0019      	movs	r1, r3
+ 80004c6:	0010      	movs	r0, r2
+ 80004c8:	f002 fa0e 	bl	80028e8 <HAL_GPIO_ReadPin>
+ 80004cc:	0003      	movs	r3, r0
+ 80004ce:	7023      	strb	r3, [r4, #0]
 
 		  holding_register_database[GPIO_READ] = ((estop_sense << ESTOP_SENSE_POS) | (sense_120 << SENSE_120_POS));
- 80004ce:	1d3b      	adds	r3, r7, #4
- 80004d0:	781b      	ldrb	r3, [r3, #0]
- 80004d2:	b21a      	sxth	r2, r3
- 80004d4:	1cfb      	adds	r3, r7, #3
- 80004d6:	781b      	ldrb	r3, [r3, #0]
- 80004d8:	005b      	lsls	r3, r3, #1
- 80004da:	b21b      	sxth	r3, r3
- 80004dc:	4313      	orrs	r3, r2
- 80004de:	b21b      	sxth	r3, r3
- 80004e0:	b29a      	uxth	r2, r3
- 80004e2:	4ba4      	ldr	r3, [pc, #656]	@ (8000774 <main+0x380>)
- 80004e4:	815a      	strh	r2, [r3, #10]
+ 80004d0:	1d3b      	adds	r3, r7, #4
+ 80004d2:	781b      	ldrb	r3, [r3, #0]
+ 80004d4:	b21a      	sxth	r2, r3
+ 80004d6:	1cfb      	adds	r3, r7, #3
+ 80004d8:	781b      	ldrb	r3, [r3, #0]
+ 80004da:	005b      	lsls	r3, r3, #1
+ 80004dc:	b21b      	sxth	r3, r3
+ 80004de:	4313      	orrs	r3, r2
+ 80004e0:	b21b      	sxth	r3, r3
+ 80004e2:	b29a      	uxth	r2, r3
+ 80004e4:	4ba3      	ldr	r3, [pc, #652]	@ (8000774 <main+0x380>)
+ 80004e6:	815a      	strh	r2, [r3, #10]
 
 		  // Handle adjustment of the GPIO_WRITE pins
 		  if(prev_gpio_write_register != holding_register_database[GPIO_WRITE])
- 80004e6:	4ba3      	ldr	r3, [pc, #652]	@ (8000774 <main+0x380>)
- 80004e8:	899a      	ldrh	r2, [r3, #12]
- 80004ea:	4ba3      	ldr	r3, [pc, #652]	@ (8000778 <main+0x384>)
- 80004ec:	881b      	ldrh	r3, [r3, #0]
- 80004ee:	429a      	cmp	r2, r3
- 80004f0:	d033      	beq.n	800055a <main+0x166>
+ 80004e8:	4ba2      	ldr	r3, [pc, #648]	@ (8000774 <main+0x380>)
+ 80004ea:	899a      	ldrh	r2, [r3, #12]
+ 80004ec:	4ba2      	ldr	r3, [pc, #648]	@ (8000778 <main+0x384>)
+ 80004ee:	881b      	ldrh	r3, [r3, #0]
+ 80004f0:	429a      	cmp	r2, r3
+ 80004f2:	d033      	beq.n	800055c <main+0x168>
 		  {
 			  if((prev_gpio_write_register & RELAY_120_MASK) != (holding_register_database[GPIO_WRITE] & RELAY_120_MASK))
- 80004f2:	4ba0      	ldr	r3, [pc, #640]	@ (8000774 <main+0x380>)
- 80004f4:	899a      	ldrh	r2, [r3, #12]
- 80004f6:	4ba0      	ldr	r3, [pc, #640]	@ (8000778 <main+0x384>)
- 80004f8:	881b      	ldrh	r3, [r3, #0]
- 80004fa:	4053      	eors	r3, r2
- 80004fc:	b29b      	uxth	r3, r3
- 80004fe:	001a      	movs	r2, r3
- 8000500:	2301      	movs	r3, #1
- 8000502:	4013      	ands	r3, r2
- 8000504:	d00b      	beq.n	800051e <main+0x12a>
+ 80004f4:	4b9f      	ldr	r3, [pc, #636]	@ (8000774 <main+0x380>)
+ 80004f6:	899a      	ldrh	r2, [r3, #12]
+ 80004f8:	4b9f      	ldr	r3, [pc, #636]	@ (8000778 <main+0x384>)
+ 80004fa:	881b      	ldrh	r3, [r3, #0]
+ 80004fc:	4053      	eors	r3, r2
+ 80004fe:	b29b      	uxth	r3, r3
+ 8000500:	001a      	movs	r2, r3
+ 8000502:	2301      	movs	r3, #1
+ 8000504:	4013      	ands	r3, r2
+ 8000506:	d00b      	beq.n	8000520 <main+0x12c>
 			  {
 				  HAL_GPIO_WritePin(RELAY_120_GPIO_Port, RELAY_120_Pin, (holding_register_database[GPIO_WRITE] & RELAY_120_MASK));
- 8000506:	4b9b      	ldr	r3, [pc, #620]	@ (8000774 <main+0x380>)
- 8000508:	899b      	ldrh	r3, [r3, #12]
- 800050a:	b2db      	uxtb	r3, r3
- 800050c:	2201      	movs	r2, #1
- 800050e:	4013      	ands	r3, r2
- 8000510:	b2da      	uxtb	r2, r3
- 8000512:	2380      	movs	r3, #128	@ 0x80
- 8000514:	005b      	lsls	r3, r3, #1
- 8000516:	4896      	ldr	r0, [pc, #600]	@ (8000770 <main+0x37c>)
- 8000518:	0019      	movs	r1, r3
- 800051a:	f002 fa02 	bl	8002922 <HAL_GPIO_WritePin>
+ 8000508:	4b9a      	ldr	r3, [pc, #616]	@ (8000774 <main+0x380>)
+ 800050a:	899b      	ldrh	r3, [r3, #12]
+ 800050c:	b2db      	uxtb	r3, r3
+ 800050e:	2201      	movs	r2, #1
+ 8000510:	4013      	ands	r3, r2
+ 8000512:	b2da      	uxtb	r2, r3
+ 8000514:	2380      	movs	r3, #128	@ 0x80
+ 8000516:	005b      	lsls	r3, r3, #1
+ 8000518:	4895      	ldr	r0, [pc, #596]	@ (8000770 <main+0x37c>)
+ 800051a:	0019      	movs	r1, r3
+ 800051c:	f002 fa01 	bl	8002922 <HAL_GPIO_WritePin>
 			  }
 			  if((prev_gpio_write_register & RELAY_480_MASK) != (holding_register_database[GPIO_WRITE] & RELAY_480_MASK))
- 800051e:	4b95      	ldr	r3, [pc, #596]	@ (8000774 <main+0x380>)
- 8000520:	899a      	ldrh	r2, [r3, #12]
- 8000522:	4b95      	ldr	r3, [pc, #596]	@ (8000778 <main+0x384>)
- 8000524:	881b      	ldrh	r3, [r3, #0]
- 8000526:	4053      	eors	r3, r2
- 8000528:	b29b      	uxth	r3, r3
- 800052a:	001a      	movs	r2, r3
- 800052c:	2302      	movs	r3, #2
- 800052e:	4013      	ands	r3, r2
- 8000530:	d00a      	beq.n	8000548 <main+0x154>
+ 8000520:	4b94      	ldr	r3, [pc, #592]	@ (8000774 <main+0x380>)
+ 8000522:	899a      	ldrh	r2, [r3, #12]
+ 8000524:	4b94      	ldr	r3, [pc, #592]	@ (8000778 <main+0x384>)
+ 8000526:	881b      	ldrh	r3, [r3, #0]
+ 8000528:	4053      	eors	r3, r2
+ 800052a:	b29b      	uxth	r3, r3
+ 800052c:	001a      	movs	r2, r3
+ 800052e:	2302      	movs	r3, #2
+ 8000530:	4013      	ands	r3, r2
+ 8000532:	d00a      	beq.n	800054a <main+0x156>
 			  {
 				  HAL_GPIO_WritePin(RELAY_480_GPIO_Port, RELAY_480_Pin, (holding_register_database[GPIO_WRITE] & RELAY_480_MASK));
- 8000532:	4b90      	ldr	r3, [pc, #576]	@ (8000774 <main+0x380>)
- 8000534:	899b      	ldrh	r3, [r3, #12]
- 8000536:	b2db      	uxtb	r3, r3
- 8000538:	2202      	movs	r2, #2
- 800053a:	4013      	ands	r3, r2
- 800053c:	b2db      	uxtb	r3, r3
- 800053e:	488c      	ldr	r0, [pc, #560]	@ (8000770 <main+0x37c>)
- 8000540:	001a      	movs	r2, r3
- 8000542:	2180      	movs	r1, #128	@ 0x80
- 8000544:	f002 f9ed 	bl	8002922 <HAL_GPIO_WritePin>
+ 8000534:	4b8f      	ldr	r3, [pc, #572]	@ (8000774 <main+0x380>)
+ 8000536:	899b      	ldrh	r3, [r3, #12]
+ 8000538:	b2db      	uxtb	r3, r3
+ 800053a:	2202      	movs	r2, #2
+ 800053c:	4013      	ands	r3, r2
+ 800053e:	b2db      	uxtb	r3, r3
+ 8000540:	488b      	ldr	r0, [pc, #556]	@ (8000770 <main+0x37c>)
+ 8000542:	001a      	movs	r2, r3
+ 8000544:	2180      	movs	r1, #128	@ 0x80
+ 8000546:	f002 f9ec 	bl	8002922 <HAL_GPIO_WritePin>
 			  }
 			  prev_gpio_write_register = holding_register_database[GPIO_WRITE];
- 8000548:	4b8a      	ldr	r3, [pc, #552]	@ (8000774 <main+0x380>)
- 800054a:	899a      	ldrh	r2, [r3, #12]
- 800054c:	4b8a      	ldr	r3, [pc, #552]	@ (8000778 <main+0x384>)
- 800054e:	801a      	strh	r2, [r3, #0]
+ 800054a:	4b8a      	ldr	r3, [pc, #552]	@ (8000774 <main+0x380>)
+ 800054c:	899a      	ldrh	r2, [r3, #12]
+ 800054e:	4b8a      	ldr	r3, [pc, #552]	@ (8000778 <main+0x384>)
+ 8000550:	801a      	strh	r2, [r3, #0]
 			  wdg_time = HAL_GetTick();
- 8000550:	f001 fa90 	bl	8001a74 <HAL_GetTick>
- 8000554:	0002      	movs	r2, r0
- 8000556:	4b84      	ldr	r3, [pc, #528]	@ (8000768 <main+0x374>)
- 8000558:	601a      	str	r2, [r3, #0]
+ 8000552:	f001 fa8f 	bl	8001a74 <HAL_GetTick>
+ 8000556:	0002      	movs	r2, r0
+ 8000558:	4b83      	ldr	r3, [pc, #524]	@ (8000768 <main+0x374>)
+ 800055a:	601a      	str	r2, [r3, #0]
 		  }
 
 		  // Handle Watchdog Timeout
 		  if(HAL_GetTick() - wdg_time > (uint32_t)(holding_register_database[WDG_TIMEOUT]))
- 800055a:	f001 fa8b 	bl	8001a74 <HAL_GetTick>
- 800055e:	0002      	movs	r2, r0
- 8000560:	4b81      	ldr	r3, [pc, #516]	@ (8000768 <main+0x374>)
- 8000562:	681b      	ldr	r3, [r3, #0]
- 8000564:	1ad3      	subs	r3, r2, r3
- 8000566:	4a83      	ldr	r2, [pc, #524]	@ (8000774 <main+0x380>)
- 8000568:	89d2      	ldrh	r2, [r2, #14]
- 800056a:	4293      	cmp	r3, r2
- 800056c:	d912      	bls.n	8000594 <main+0x1a0>
+ 800055c:	f001 fa8a 	bl	8001a74 <HAL_GetTick>
+ 8000560:	0002      	movs	r2, r0
+ 8000562:	4b81      	ldr	r3, [pc, #516]	@ (8000768 <main+0x374>)
+ 8000564:	681b      	ldr	r3, [r3, #0]
+ 8000566:	1ad3      	subs	r3, r2, r3
+ 8000568:	4a82      	ldr	r2, [pc, #520]	@ (8000774 <main+0x380>)
+ 800056a:	89d2      	ldrh	r2, [r2, #14]
+ 800056c:	4293      	cmp	r3, r2
+ 800056e:	d912      	bls.n	8000596 <main+0x1a2>
 		  {
 			  // Turn off the TBM
 			  HAL_GPIO_WritePin(RELAY_480_GPIO_Port, RELAY_480_Pin, GPIO_PIN_RESET);
- 800056e:	4b80      	ldr	r3, [pc, #512]	@ (8000770 <main+0x37c>)
- 8000570:	2200      	movs	r2, #0
- 8000572:	2180      	movs	r1, #128	@ 0x80
- 8000574:	0018      	movs	r0, r3
- 8000576:	f002 f9d4 	bl	8002922 <HAL_GPIO_WritePin>
+ 8000570:	4b7f      	ldr	r3, [pc, #508]	@ (8000770 <main+0x37c>)
+ 8000572:	2200      	movs	r2, #0
+ 8000574:	2180      	movs	r1, #128	@ 0x80
+ 8000576:	0018      	movs	r0, r3
+ 8000578:	f002 f9d3 	bl	8002922 <HAL_GPIO_WritePin>
 			  HAL_GPIO_WritePin(RELAY_120_GPIO_Port, RELAY_120_Pin, GPIO_PIN_RESET);
- 800057a:	2380      	movs	r3, #128	@ 0x80
- 800057c:	005b      	lsls	r3, r3, #1
- 800057e:	487c      	ldr	r0, [pc, #496]	@ (8000770 <main+0x37c>)
- 8000580:	2200      	movs	r2, #0
- 8000582:	0019      	movs	r1, r3
- 8000584:	f002 f9cd 	bl	8002922 <HAL_GPIO_WritePin>
+ 800057c:	2380      	movs	r3, #128	@ 0x80
+ 800057e:	005b      	lsls	r3, r3, #1
+ 8000580:	487b      	ldr	r0, [pc, #492]	@ (8000770 <main+0x37c>)
+ 8000582:	2200      	movs	r2, #0
+ 8000584:	0019      	movs	r1, r3
+ 8000586:	f002 f9cc 	bl	8002922 <HAL_GPIO_WritePin>
 
 			  // Update the holding register database
 			  holding_register_database[GPIO_WRITE] = 0;
- 8000588:	4b7a      	ldr	r3, [pc, #488]	@ (8000774 <main+0x380>)
- 800058a:	2200      	movs	r2, #0
- 800058c:	819a      	strh	r2, [r3, #12]
+ 800058a:	4b7a      	ldr	r3, [pc, #488]	@ (8000774 <main+0x380>)
+ 800058c:	2200      	movs	r2, #0
+ 800058e:	819a      	strh	r2, [r3, #12]
 			  prev_gpio_write_register = 0;
- 800058e:	4b7a      	ldr	r3, [pc, #488]	@ (8000778 <main+0x384>)
- 8000590:	2200      	movs	r2, #0
- 8000592:	801a      	strh	r2, [r3, #0]
+ 8000590:	4b79      	ldr	r3, [pc, #484]	@ (8000778 <main+0x384>)
+ 8000592:	2200      	movs	r2, #0
+ 8000594:	801a      	strh	r2, [r3, #0]
 		  }
 
 		  // Handle Modbus Communication
 		  if(modbus_rx())
- 8000594:	f000 faf4 	bl	8000b80 <modbus_rx>
- 8000598:	1e03      	subs	r3, r0, #0
- 800059a:	d100      	bne.n	800059e <main+0x1aa>
- 800059c:	e07e      	b.n	800069c <main+0x2a8>
+ 8000596:	f000 faf3 	bl	8000b80 <modbus_rx>
+ 800059a:	1e03      	subs	r3, r0, #0
+ 800059c:	d100      	bne.n	80005a0 <main+0x1ac>
+ 800059e:	e07e      	b.n	800069e <main+0x2aa>
 		  {
 			  if(get_rx_buffer(0) == holding_register_database[MODBUS_ID]) // Check Slave ID
- 800059e:	2000      	movs	r0, #0
- 80005a0:	f000 ff66 	bl	8001470 <get_rx_buffer>
- 80005a4:	0003      	movs	r3, r0
- 80005a6:	001a      	movs	r2, r3
- 80005a8:	4b72      	ldr	r3, [pc, #456]	@ (8000774 <main+0x380>)
- 80005aa:	881b      	ldrh	r3, [r3, #0]
- 80005ac:	429a      	cmp	r2, r3
- 80005ae:	d138      	bne.n	8000622 <main+0x22e>
+ 80005a0:	2000      	movs	r0, #0
+ 80005a2:	f000 ff65 	bl	8001470 <get_rx_buffer>
+ 80005a6:	0003      	movs	r3, r0
+ 80005a8:	001a      	movs	r2, r3
+ 80005aa:	4b72      	ldr	r3, [pc, #456]	@ (8000774 <main+0x380>)
+ 80005ac:	881b      	ldrh	r3, [r3, #0]
+ 80005ae:	429a      	cmp	r2, r3
+ 80005b0:	d138      	bne.n	8000624 <main+0x230>
 			  {
 				  wdg_time = HAL_GetTick();
- 80005b0:	f001 fa60 	bl	8001a74 <HAL_GetTick>
- 80005b4:	0002      	movs	r2, r0
- 80005b6:	4b6c      	ldr	r3, [pc, #432]	@ (8000768 <main+0x374>)
- 80005b8:	601a      	str	r2, [r3, #0]
+ 80005b2:	f001 fa5f 	bl	8001a74 <HAL_GetTick>
+ 80005b6:	0002      	movs	r2, r0
+ 80005b8:	4b6b      	ldr	r3, [pc, #428]	@ (8000768 <main+0x374>)
+ 80005ba:	601a      	str	r2, [r3, #0]
 				  switch(get_rx_buffer(1))
- 80005ba:	2001      	movs	r0, #1
- 80005bc:	f000 ff58 	bl	8001470 <get_rx_buffer>
- 80005c0:	0003      	movs	r3, r0
- 80005c2:	2b03      	cmp	r3, #3
- 80005c4:	d002      	beq.n	80005cc <main+0x1d8>
- 80005c6:	2b10      	cmp	r3, #16
- 80005c8:	d008      	beq.n	80005dc <main+0x1e8>
- 80005ca:	e00f      	b.n	80005ec <main+0x1f8>
+ 80005bc:	2001      	movs	r0, #1
+ 80005be:	f000 ff57 	bl	8001470 <get_rx_buffer>
+ 80005c2:	0003      	movs	r3, r0
+ 80005c4:	2b03      	cmp	r3, #3
+ 80005c6:	d002      	beq.n	80005ce <main+0x1da>
+ 80005c8:	2b10      	cmp	r3, #16
+ 80005ca:	d008      	beq.n	80005de <main+0x1ea>
+ 80005cc:	e00f      	b.n	80005ee <main+0x1fa>
 				  {
 					  case 0x03:
 					  {
 						  // Return holding registers
 						  modbus_status = return_holding_registers(&modbus_tx_len);
- 80005cc:	1dfc      	adds	r4, r7, #7
- 80005ce:	1cbb      	adds	r3, r7, #2
- 80005d0:	0018      	movs	r0, r3
- 80005d2:	f000 fae7 	bl	8000ba4 <return_holding_registers>
- 80005d6:	0003      	movs	r3, r0
- 80005d8:	7023      	strb	r3, [r4, #0]
+ 80005ce:	1dfc      	adds	r4, r7, #7
+ 80005d0:	1cbb      	adds	r3, r7, #2
+ 80005d2:	0018      	movs	r0, r3
+ 80005d4:	f000 fae6 	bl	8000ba4 <return_holding_registers>
+ 80005d8:	0003      	movs	r3, r0
+ 80005da:	7023      	strb	r3, [r4, #0]
 						  break;
- 80005da:	e00e      	b.n	80005fa <main+0x206>
+ 80005dc:	e00e      	b.n	80005fc <main+0x208>
 					  }
 					  case 0x10:
 					  {
 						  // Write holding registers
 						  modbus_status = edit_multiple_registers(&modbus_tx_len);
- 80005dc:	1dfc      	adds	r4, r7, #7
- 80005de:	1cbb      	adds	r3, r7, #2
- 80005e0:	0018      	movs	r0, r3
- 80005e2:	f000 fb8b 	bl	8000cfc <edit_multiple_registers>
- 80005e6:	0003      	movs	r3, r0
- 80005e8:	7023      	strb	r3, [r4, #0]
+ 80005de:	1dfc      	adds	r4, r7, #7
+ 80005e0:	1cbb      	adds	r3, r7, #2
+ 80005e2:	0018      	movs	r0, r3
+ 80005e4:	f000 fb8a 	bl	8000cfc <edit_multiple_registers>
+ 80005e8:	0003      	movs	r3, r0
+ 80005ea:	7023      	strb	r3, [r4, #0]
 						  break;
- 80005ea:	e006      	b.n	80005fa <main+0x206>
+ 80005ec:	e006      	b.n	80005fc <main+0x208>
 					  }
 					  default:
 					  {
 						  modbus_status = modbus_exception(MB_ILLEGAL_FUNCTION);
- 80005ec:	1dfc      	adds	r4, r7, #7
- 80005ee:	2004      	movs	r0, #4
- 80005f0:	f000 fc86 	bl	8000f00 <modbus_exception>
- 80005f4:	0003      	movs	r3, r0
- 80005f6:	7023      	strb	r3, [r4, #0]
+ 80005ee:	1dfc      	adds	r4, r7, #7
+ 80005f0:	2004      	movs	r0, #4
+ 80005f2:	f000 fc85 	bl	8000f00 <modbus_exception>
+ 80005f6:	0003      	movs	r3, r0
+ 80005f8:	7023      	strb	r3, [r4, #0]
 						  break;
- 80005f8:	46c0      	nop			@ (mov r8, r8)
+ 80005fa:	46c0      	nop			@ (mov r8, r8)
 					  }
 				  }
 				  if(modbus_status != 0)
- 80005fa:	1dfb      	adds	r3, r7, #7
- 80005fc:	781b      	ldrb	r3, [r3, #0]
- 80005fe:	b25b      	sxtb	r3, r3
- 8000600:	2b00      	cmp	r3, #0
- 8000602:	d04b      	beq.n	800069c <main+0x2a8>
+ 80005fc:	1dfb      	adds	r3, r7, #7
+ 80005fe:	781b      	ldrb	r3, [r3, #0]
+ 8000600:	b25b      	sxtb	r3, r3
+ 8000602:	2b00      	cmp	r3, #0
+ 8000604:	d04b      	beq.n	800069e <main+0x2aa>
 				  {
 					  holding_register_database[MB_ERRORS] |= 1U << ((modbus_status) + (MB_FATAL_ERROR - RANGE_ERROR));
- 8000604:	4b5b      	ldr	r3, [pc, #364]	@ (8000774 <main+0x380>)
- 8000606:	891a      	ldrh	r2, [r3, #8]
- 8000608:	1dfb      	adds	r3, r7, #7
- 800060a:	781b      	ldrb	r3, [r3, #0]
- 800060c:	b25b      	sxtb	r3, r3
- 800060e:	3307      	adds	r3, #7
- 8000610:	2101      	movs	r1, #1
- 8000612:	4099      	lsls	r1, r3
- 8000614:	000b      	movs	r3, r1
- 8000616:	b29b      	uxth	r3, r3
- 8000618:	4313      	orrs	r3, r2
- 800061a:	b29a      	uxth	r2, r3
- 800061c:	4b55      	ldr	r3, [pc, #340]	@ (8000774 <main+0x380>)
- 800061e:	811a      	strh	r2, [r3, #8]
- 8000620:	e03c      	b.n	800069c <main+0x2a8>
+ 8000606:	4b5b      	ldr	r3, [pc, #364]	@ (8000774 <main+0x380>)
+ 8000608:	891a      	ldrh	r2, [r3, #8]
+ 800060a:	1dfb      	adds	r3, r7, #7
+ 800060c:	781b      	ldrb	r3, [r3, #0]
+ 800060e:	b25b      	sxtb	r3, r3
+ 8000610:	3307      	adds	r3, #7
+ 8000612:	2101      	movs	r1, #1
+ 8000614:	4099      	lsls	r1, r3
+ 8000616:	000b      	movs	r3, r1
+ 8000618:	b29b      	uxth	r3, r3
+ 800061a:	4313      	orrs	r3, r2
+ 800061c:	b29a      	uxth	r2, r3
+ 800061e:	4b55      	ldr	r3, [pc, #340]	@ (8000774 <main+0x380>)
+ 8000620:	811a      	strh	r2, [r3, #8]
+ 8000622:	e03c      	b.n	800069e <main+0x2aa>
 				  }
 			  }
 			  // Special case where you retrieve the modbus ID
 			  else if((get_rx_buffer(0) == 0xFF) && // modbus_id = 0xFF = 255
- 8000622:	2000      	movs	r0, #0
- 8000624:	f000 ff24 	bl	8001470 <get_rx_buffer>
- 8000628:	0003      	movs	r3, r0
- 800062a:	2bff      	cmp	r3, #255	@ 0xff
- 800062c:	d136      	bne.n	800069c <main+0x2a8>
+ 8000624:	2000      	movs	r0, #0
+ 8000626:	f000 ff23 	bl	8001470 <get_rx_buffer>
+ 800062a:	0003      	movs	r3, r0
+ 800062c:	2bff      	cmp	r3, #255	@ 0xff
+ 800062e:	d136      	bne.n	800069e <main+0x2aa>
 				(get_rx_buffer(1) == 0x03) && // Function code = read_holding_registers
- 800062e:	2001      	movs	r0, #1
- 8000630:	f000 ff1e 	bl	8001470 <get_rx_buffer>
- 8000634:	0003      	movs	r3, r0
+ 8000630:	2001      	movs	r0, #1
+ 8000632:	f000 ff1d 	bl	8001470 <get_rx_buffer>
+ 8000636:	0003      	movs	r3, r0
 			  else if((get_rx_buffer(0) == 0xFF) && // modbus_id = 0xFF = 255
- 8000636:	2b03      	cmp	r3, #3
- 8000638:	d130      	bne.n	800069c <main+0x2a8>
+ 8000638:	2b03      	cmp	r3, #3
+ 800063a:	d130      	bne.n	800069e <main+0x2aa>
 				(((get_rx_buffer(2) << 8) | get_rx_buffer(3)) == 0x00) && // Address to read = 0
- 800063a:	2002      	movs	r0, #2
- 800063c:	f000 ff18 	bl	8001470 <get_rx_buffer>
- 8000640:	0003      	movs	r3, r0
- 8000642:	021c      	lsls	r4, r3, #8
- 8000644:	2003      	movs	r0, #3
- 8000646:	f000 ff13 	bl	8001470 <get_rx_buffer>
- 800064a:	0003      	movs	r3, r0
- 800064c:	4323      	orrs	r3, r4
+ 800063c:	2002      	movs	r0, #2
+ 800063e:	f000 ff17 	bl	8001470 <get_rx_buffer>
+ 8000642:	0003      	movs	r3, r0
+ 8000644:	021c      	lsls	r4, r3, #8
+ 8000646:	2003      	movs	r0, #3
+ 8000648:	f000 ff12 	bl	8001470 <get_rx_buffer>
+ 800064c:	0003      	movs	r3, r0
+ 800064e:	4323      	orrs	r3, r4
 				(get_rx_buffer(1) == 0x03) && // Function code = read_holding_registers
- 800064e:	d125      	bne.n	800069c <main+0x2a8>
+ 8000650:	d125      	bne.n	800069e <main+0x2aa>
 				(((get_rx_buffer(4) << 8) | get_rx_buffer(5)) == 1)) // # of registers to read = 1
- 8000650:	2004      	movs	r0, #4
- 8000652:	f000 ff0d 	bl	8001470 <get_rx_buffer>
- 8000656:	0003      	movs	r3, r0
- 8000658:	021c      	lsls	r4, r3, #8
- 800065a:	2005      	movs	r0, #5
- 800065c:	f000 ff08 	bl	8001470 <get_rx_buffer>
- 8000660:	0003      	movs	r3, r0
- 8000662:	4323      	orrs	r3, r4
+ 8000652:	2004      	movs	r0, #4
+ 8000654:	f000 ff0c 	bl	8001470 <get_rx_buffer>
+ 8000658:	0003      	movs	r3, r0
+ 800065a:	021c      	lsls	r4, r3, #8
+ 800065c:	2005      	movs	r0, #5
+ 800065e:	f000 ff07 	bl	8001470 <get_rx_buffer>
+ 8000662:	0003      	movs	r3, r0
+ 8000664:	4323      	orrs	r3, r4
 				(((get_rx_buffer(2) << 8) | get_rx_buffer(3)) == 0x00) && // Address to read = 0
- 8000664:	2b01      	cmp	r3, #1
- 8000666:	d119      	bne.n	800069c <main+0x2a8>
+ 8000666:	2b01      	cmp	r3, #1
+ 8000668:	d119      	bne.n	800069e <main+0x2aa>
 			  {
 				  modbus_status = return_holding_registers(&modbus_tx_len);
- 8000668:	1dfc      	adds	r4, r7, #7
- 800066a:	1cbb      	adds	r3, r7, #2
- 800066c:	0018      	movs	r0, r3
- 800066e:	f000 fa99 	bl	8000ba4 <return_holding_registers>
- 8000672:	0003      	movs	r3, r0
- 8000674:	7023      	strb	r3, [r4, #0]
+ 800066a:	1dfc      	adds	r4, r7, #7
+ 800066c:	1cbb      	adds	r3, r7, #2
+ 800066e:	0018      	movs	r0, r3
+ 8000670:	f000 fa98 	bl	8000ba4 <return_holding_registers>
+ 8000674:	0003      	movs	r3, r0
+ 8000676:	7023      	strb	r3, [r4, #0]
 				  if(modbus_status != 0)
- 8000676:	1dfb      	adds	r3, r7, #7
- 8000678:	781b      	ldrb	r3, [r3, #0]
- 800067a:	b25b      	sxtb	r3, r3
- 800067c:	2b00      	cmp	r3, #0
- 800067e:	d00d      	beq.n	800069c <main+0x2a8>
+ 8000678:	1dfb      	adds	r3, r7, #7
+ 800067a:	781b      	ldrb	r3, [r3, #0]
+ 800067c:	b25b      	sxtb	r3, r3
+ 800067e:	2b00      	cmp	r3, #0
+ 8000680:	d00d      	beq.n	800069e <main+0x2aa>
 				  {
 					  holding_register_database[MB_ERRORS] |= 1U << ((modbus_status) + (MB_FATAL_ERROR - RANGE_ERROR));
- 8000680:	4b3c      	ldr	r3, [pc, #240]	@ (8000774 <main+0x380>)
- 8000682:	891a      	ldrh	r2, [r3, #8]
- 8000684:	1dfb      	adds	r3, r7, #7
- 8000686:	781b      	ldrb	r3, [r3, #0]
- 8000688:	b25b      	sxtb	r3, r3
- 800068a:	3307      	adds	r3, #7
- 800068c:	2101      	movs	r1, #1
- 800068e:	4099      	lsls	r1, r3
- 8000690:	000b      	movs	r3, r1
- 8000692:	b29b      	uxth	r3, r3
- 8000694:	4313      	orrs	r3, r2
- 8000696:	b29a      	uxth	r2, r3
- 8000698:	4b36      	ldr	r3, [pc, #216]	@ (8000774 <main+0x380>)
- 800069a:	811a      	strh	r2, [r3, #8]
+ 8000682:	4b3c      	ldr	r3, [pc, #240]	@ (8000774 <main+0x380>)
+ 8000684:	891a      	ldrh	r2, [r3, #8]
+ 8000686:	1dfb      	adds	r3, r7, #7
+ 8000688:	781b      	ldrb	r3, [r3, #0]
+ 800068a:	b25b      	sxtb	r3, r3
+ 800068c:	3307      	adds	r3, #7
+ 800068e:	2101      	movs	r1, #1
+ 8000690:	4099      	lsls	r1, r3
+ 8000692:	000b      	movs	r3, r1
+ 8000694:	b29b      	uxth	r3, r3
+ 8000696:	4313      	orrs	r3, r2
+ 8000698:	b29a      	uxth	r2, r3
+ 800069a:	4b36      	ldr	r3, [pc, #216]	@ (8000774 <main+0x380>)
+ 800069c:	811a      	strh	r2, [r3, #8]
 				  }
 			  }
 		  }
 		  modbus_status = monitor_modbus();
- 800069c:	1dfc      	adds	r4, r7, #7
- 800069e:	f000 fddd 	bl	800125c <monitor_modbus>
- 80006a2:	0003      	movs	r3, r0
- 80006a4:	7023      	strb	r3, [r4, #0]
+ 800069e:	1dfc      	adds	r4, r7, #7
+ 80006a0:	f000 fddc 	bl	800125c <monitor_modbus>
+ 80006a4:	0003      	movs	r3, r0
+ 80006a6:	7023      	strb	r3, [r4, #0]
 		  if(modbus_status != HAL_OK && modbus_status != HAL_BUSY)
- 80006a6:	1dfb      	adds	r3, r7, #7
- 80006a8:	781b      	ldrb	r3, [r3, #0]
- 80006aa:	b25b      	sxtb	r3, r3
- 80006ac:	2b00      	cmp	r3, #0
- 80006ae:	d100      	bne.n	80006b2 <main+0x2be>
- 80006b0:	e09d      	b.n	80007ee <main+0x3fa>
- 80006b2:	1dfb      	adds	r3, r7, #7
- 80006b4:	781b      	ldrb	r3, [r3, #0]
- 80006b6:	b25b      	sxtb	r3, r3
- 80006b8:	2b02      	cmp	r3, #2
- 80006ba:	d100      	bne.n	80006be <main+0x2ca>
- 80006bc:	e097      	b.n	80007ee <main+0x3fa>
+ 80006a8:	1dfb      	adds	r3, r7, #7
+ 80006aa:	781b      	ldrb	r3, [r3, #0]
+ 80006ac:	b25b      	sxtb	r3, r3
+ 80006ae:	2b00      	cmp	r3, #0
+ 80006b0:	d100      	bne.n	80006b4 <main+0x2c0>
+ 80006b2:	e09c      	b.n	80007ee <main+0x3fa>
+ 80006b4:	1dfb      	adds	r3, r7, #7
+ 80006b6:	781b      	ldrb	r3, [r3, #0]
+ 80006b8:	b25b      	sxtb	r3, r3
+ 80006ba:	2b02      	cmp	r3, #2
+ 80006bc:	d100      	bne.n	80006c0 <main+0x2cc>
+ 80006be:	e096      	b.n	80007ee <main+0x3fa>
 		  {
 			  switch(modbus_status)
- 80006be:	1dfb      	adds	r3, r7, #7
- 80006c0:	781b      	ldrb	r3, [r3, #0]
- 80006c2:	b25b      	sxtb	r3, r3
- 80006c4:	2b15      	cmp	r3, #21
- 80006c6:	d05e      	beq.n	8000786 <main+0x392>
- 80006c8:	dd00      	ble.n	80006cc <main+0x2d8>
- 80006ca:	e6b2      	b.n	8000432 <main+0x3e>
- 80006cc:	2b14      	cmp	r3, #20
- 80006ce:	d036      	beq.n	800073e <main+0x34a>
- 80006d0:	dd00      	ble.n	80006d4 <main+0x2e0>
- 80006d2:	e6ae      	b.n	8000432 <main+0x3e>
- 80006d4:	2b12      	cmp	r3, #18
- 80006d6:	d000      	beq.n	80006da <main+0x2e6>
- 80006d8:	e08b      	b.n	80007f2 <main+0x3fe>
+ 80006c0:	1dfb      	adds	r3, r7, #7
+ 80006c2:	781b      	ldrb	r3, [r3, #0]
+ 80006c4:	b25b      	sxtb	r3, r3
+ 80006c6:	2b15      	cmp	r3, #21
+ 80006c8:	d05d      	beq.n	8000786 <main+0x392>
+ 80006ca:	dd00      	ble.n	80006ce <main+0x2da>
+ 80006cc:	e6b1      	b.n	8000432 <main+0x3e>
+ 80006ce:	2b14      	cmp	r3, #20
+ 80006d0:	d036      	beq.n	8000740 <main+0x34c>
+ 80006d2:	dd00      	ble.n	80006d6 <main+0x2e2>
+ 80006d4:	e6ad      	b.n	8000432 <main+0x3e>
+ 80006d6:	2b12      	cmp	r3, #18
+ 80006d8:	d000      	beq.n	80006dc <main+0x2e8>
+ 80006da:	e08a      	b.n	80007f2 <main+0x3fe>
 			  {
 				  case MB_TX_TIMEOUT:
 				  {
 					  for(uint8_t i = 0; i < holding_register_database[MB_TRANSMIT_RETRIES]; i++)
- 80006da:	1dbb      	adds	r3, r7, #6
- 80006dc:	2200      	movs	r2, #0
- 80006de:	701a      	strb	r2, [r3, #0]
- 80006e0:	e025      	b.n	800072e <main+0x33a>
+ 80006dc:	1dbb      	adds	r3, r7, #6
+ 80006de:	2200      	movs	r2, #0
+ 80006e0:	701a      	strb	r2, [r3, #0]
+ 80006e2:	e025      	b.n	8000730 <main+0x33c>
 					  {
 						  modbus_status = modbus_send(modbus_tx_len);
- 80006e2:	1cbb      	adds	r3, r7, #2
- 80006e4:	781b      	ldrb	r3, [r3, #0]
- 80006e6:	1dfc      	adds	r4, r7, #7
- 80006e8:	0018      	movs	r0, r3
- 80006ea:	f000 fcbd 	bl	8001068 <modbus_send>
- 80006ee:	0003      	movs	r3, r0
- 80006f0:	7023      	strb	r3, [r4, #0]
+ 80006e4:	1cbb      	adds	r3, r7, #2
+ 80006e6:	781b      	ldrb	r3, [r3, #0]
+ 80006e8:	1dfc      	adds	r4, r7, #7
+ 80006ea:	0018      	movs	r0, r3
+ 80006ec:	f000 fcbc 	bl	8001068 <modbus_send>
+ 80006f0:	0003      	movs	r3, r0
+ 80006f2:	7023      	strb	r3, [r4, #0]
 						  while(monitor_modbus() == HAL_BUSY);
- 80006f2:	46c0      	nop			@ (mov r8, r8)
- 80006f4:	f000 fdb2 	bl	800125c <monitor_modbus>
- 80006f8:	0003      	movs	r3, r0
- 80006fa:	2b02      	cmp	r3, #2
- 80006fc:	d0fa      	beq.n	80006f4 <main+0x300>
+ 80006f4:	46c0      	nop			@ (mov r8, r8)
+ 80006f6:	f000 fdb1 	bl	800125c <monitor_modbus>
+ 80006fa:	0003      	movs	r3, r0
+ 80006fc:	2b02      	cmp	r3, #2
+ 80006fe:	d0fa      	beq.n	80006f6 <main+0x302>
 						  if(modbus_status != HAL_OK)
- 80006fe:	1dfb      	adds	r3, r7, #7
- 8000700:	781b      	ldrb	r3, [r3, #0]
- 8000702:	b25b      	sxtb	r3, r3
- 8000704:	2b00      	cmp	r3, #0
- 8000706:	d00d      	beq.n	8000724 <main+0x330>
+ 8000700:	1dfb      	adds	r3, r7, #7
+ 8000702:	781b      	ldrb	r3, [r3, #0]
+ 8000704:	b25b      	sxtb	r3, r3
+ 8000706:	2b00      	cmp	r3, #0
+ 8000708:	d00d      	beq.n	8000726 <main+0x332>
 						  {
 							  holding_register_database[MB_ERRORS] |= 1U << ((modbus_status) + (MB_FATAL_ERROR - RANGE_ERROR));
- 8000708:	4b1a      	ldr	r3, [pc, #104]	@ (8000774 <main+0x380>)
- 800070a:	891a      	ldrh	r2, [r3, #8]
- 800070c:	1dfb      	adds	r3, r7, #7
- 800070e:	781b      	ldrb	r3, [r3, #0]
- 8000710:	b25b      	sxtb	r3, r3
- 8000712:	3307      	adds	r3, #7
- 8000714:	2101      	movs	r1, #1
- 8000716:	4099      	lsls	r1, r3
- 8000718:	000b      	movs	r3, r1
- 800071a:	b29b      	uxth	r3, r3
- 800071c:	4313      	orrs	r3, r2
- 800071e:	b29a      	uxth	r2, r3
- 8000720:	4b14      	ldr	r3, [pc, #80]	@ (8000774 <main+0x380>)
- 8000722:	811a      	strh	r2, [r3, #8]
+ 800070a:	4b1a      	ldr	r3, [pc, #104]	@ (8000774 <main+0x380>)
+ 800070c:	891a      	ldrh	r2, [r3, #8]
+ 800070e:	1dfb      	adds	r3, r7, #7
+ 8000710:	781b      	ldrb	r3, [r3, #0]
+ 8000712:	b25b      	sxtb	r3, r3
+ 8000714:	3307      	adds	r3, #7
+ 8000716:	2101      	movs	r1, #1
+ 8000718:	4099      	lsls	r1, r3
+ 800071a:	000b      	movs	r3, r1
+ 800071c:	b29b      	uxth	r3, r3
+ 800071e:	4313      	orrs	r3, r2
+ 8000720:	b29a      	uxth	r2, r3
+ 8000722:	4b14      	ldr	r3, [pc, #80]	@ (8000774 <main+0x380>)
+ 8000724:	811a      	strh	r2, [r3, #8]
 					  for(uint8_t i = 0; i < holding_register_database[MB_TRANSMIT_RETRIES]; i++)
- 8000724:	1dbb      	adds	r3, r7, #6
- 8000726:	781a      	ldrb	r2, [r3, #0]
- 8000728:	1dbb      	adds	r3, r7, #6
- 800072a:	3201      	adds	r2, #1
- 800072c:	701a      	strb	r2, [r3, #0]
- 800072e:	1dbb      	adds	r3, r7, #6
- 8000730:	781b      	ldrb	r3, [r3, #0]
- 8000732:	b29a      	uxth	r2, r3
- 8000734:	4b0f      	ldr	r3, [pc, #60]	@ (8000774 <main+0x380>)
- 8000736:	88db      	ldrh	r3, [r3, #6]
- 8000738:	429a      	cmp	r2, r3
- 800073a:	d3d2      	bcc.n	80006e2 <main+0x2ee>
+ 8000726:	1dbb      	adds	r3, r7, #6
+ 8000728:	781a      	ldrb	r2, [r3, #0]
+ 800072a:	1dbb      	adds	r3, r7, #6
+ 800072c:	3201      	adds	r2, #1
+ 800072e:	701a      	strb	r2, [r3, #0]
+ 8000730:	1dbb      	adds	r3, r7, #6
+ 8000732:	781b      	ldrb	r3, [r3, #0]
+ 8000734:	b29a      	uxth	r2, r3
+ 8000736:	4b0f      	ldr	r3, [pc, #60]	@ (8000774 <main+0x380>)
+ 8000738:	88db      	ldrh	r3, [r3, #6]
+ 800073a:	429a      	cmp	r2, r3
+ 800073c:	d3d2      	bcc.n	80006e4 <main+0x2f0>
 						  }
 					  }
 					  break;
- 800073c:	e05e      	b.n	80007fc <main+0x408>
+ 800073e:	e05d      	b.n	80007fc <main+0x408>
 					  // Error only relates to Modbus Master Nodes
 					  break;
 				  }
 				  case MB_UART_ERROR:
 				  {
 					  if(modbus_status != 0)
- 800073e:	1dfb      	adds	r3, r7, #7
- 8000740:	781b      	ldrb	r3, [r3, #0]
- 8000742:	b25b      	sxtb	r3, r3
- 8000744:	2b00      	cmp	r3, #0
- 8000746:	d056      	beq.n	80007f6 <main+0x402>
+ 8000740:	1dfb      	adds	r3, r7, #7
+ 8000742:	781b      	ldrb	r3, [r3, #0]
+ 8000744:	b25b      	sxtb	r3, r3
+ 8000746:	2b00      	cmp	r3, #0
+ 8000748:	d055      	beq.n	80007f6 <main+0x402>
 					  {
 						  holding_register_database[MB_ERRORS] |= 1U << ((modbus_status) + (MB_FATAL_ERROR - RANGE_ERROR));
- 8000748:	4b0a      	ldr	r3, [pc, #40]	@ (8000774 <main+0x380>)
- 800074a:	891a      	ldrh	r2, [r3, #8]
- 800074c:	1dfb      	adds	r3, r7, #7
- 800074e:	781b      	ldrb	r3, [r3, #0]
- 8000750:	b25b      	sxtb	r3, r3
- 8000752:	3307      	adds	r3, #7
- 8000754:	2101      	movs	r1, #1
- 8000756:	4099      	lsls	r1, r3
- 8000758:	000b      	movs	r3, r1
- 800075a:	b29b      	uxth	r3, r3
- 800075c:	4313      	orrs	r3, r2
- 800075e:	b29a      	uxth	r2, r3
- 8000760:	4b04      	ldr	r3, [pc, #16]	@ (8000774 <main+0x380>)
- 8000762:	811a      	strh	r2, [r3, #8]
+ 800074a:	4b0a      	ldr	r3, [pc, #40]	@ (8000774 <main+0x380>)
+ 800074c:	891a      	ldrh	r2, [r3, #8]
+ 800074e:	1dfb      	adds	r3, r7, #7
+ 8000750:	781b      	ldrb	r3, [r3, #0]
+ 8000752:	b25b      	sxtb	r3, r3
+ 8000754:	3307      	adds	r3, #7
+ 8000756:	2101      	movs	r1, #1
+ 8000758:	4099      	lsls	r1, r3
+ 800075a:	000b      	movs	r3, r1
+ 800075c:	b29b      	uxth	r3, r3
+ 800075e:	4313      	orrs	r3, r2
+ 8000760:	b29a      	uxth	r2, r3
+ 8000762:	4b04      	ldr	r3, [pc, #16]	@ (8000774 <main+0x380>)
+ 8000764:	811a      	strh	r2, [r3, #8]
 					  }
 					  break;
- 8000764:	e047      	b.n	80007f6 <main+0x402>
- 8000766:	46c0      	nop			@ (mov r8, r8)
+ 8000766:	e046      	b.n	80007f6 <main+0x402>
  8000768:	2000018c 	.word	0x2000018c
  800076c:	20000190 	.word	0x20000190
  8000770:	50000400 	.word	0x50000400
