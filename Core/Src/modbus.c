@@ -620,35 +620,12 @@ int8_t monitor_modbus()
 
 int8_t modbus_startup()
 {
-	int8_t status = HAL_RS485Ex_Init(&huart1, UART_DE_POLARITY_HIGH, 0, 0);
-	if(status != HAL_OK)
-	{
-		return status;
-	}
-	status = HAL_UARTEx_SetTxFifoThreshold(&huart1, UART_TXFIFO_THRESHOLD_1_8);
-	if(status != HAL_OK)
-	{
-		return status;
-	}
-	status = HAL_UARTEx_SetRxFifoThreshold(&huart1, UART_RXFIFO_THRESHOLD_1_8);
-	if(status != HAL_OK)
-	{
-		return status;
-	}
-	status = HAL_UARTEx_DisableFifoMode(&huart1);
-	return status;
+	return modbus_reset();
 }
 
 int8_t modbus_shutdown()
 {
-	int8_t status = HAL_UART_AbortReceive(&huart1);
-	if(status != HAL_OK)
-	{
-		return status;
-	}
-	status = HAL_UART_DeInit(&huart1);
-
-	return status;
+	return HAL_UART_AbortReceive(&huart1);
 }
 
 int8_t modbus_change_baud_rate()

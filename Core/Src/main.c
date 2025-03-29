@@ -143,11 +143,6 @@ int main(void)
 			  {
 				  holding_register_database[MB_ERRORS] |= 1U << ((modbus_status) + (MB_FATAL_ERROR - RANGE_ERROR));
 			  }
-			  modbus_status = modbus_set_rx();
-			  if(modbus_status != 0)
-			  {
-				  holding_register_database[MB_ERRORS] |= 1U << ((modbus_status) + (MB_FATAL_ERROR - RANGE_ERROR));
-			  }
 
 			  // Ensure this code only executes once
 			  shutdown = 0;
