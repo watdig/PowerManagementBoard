@@ -51,8 +51,8 @@ DMA_HandleTypeDef hdma_usart1_tx;
 uint16_t holding_register_database[NUM_HOLDING_REGISTERS] = {
     0x0007, // MODBUS_ID
     0x0003, // MB_BAUD_RATE
-	   500, // Timeout
-	     2, // MB Retry
+	  1000, // MB_TRANSMIT_TIMEOUT
+	     2, // MB_TRANSMIT_RETRIES
 	0x0000, // MB_ERRORS
     0x0000,	// GPIO_READ
 	0x0000,	// GPIO_WRITE

@@ -511,6 +511,9 @@ int8_t modbus_send(uint8_t size)
 int8_t modbus_reset()
 {
 	int8_t status = 0;
+	// Reset interrupt variables to default state
+	uart_tx_int = 1;
+	uart_rx_int = 0;
 	status = HAL_UART_Abort(&huart1);
 	status |= HAL_UART_DeInit(&huart1);
 	__USART1_FORCE_RESET();
