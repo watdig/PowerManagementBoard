@@ -568,6 +568,7 @@ int8_t monitor_modbus()
 	{
 		if(HAL_GetTick() - tx_time >= holding_register_database[MB_TRANSMIT_TIMEOUT])
 		{
+			uart_tx_int = 1;
 			return handle_modbus_error(MB_TX_TIMEOUT);
 		}
 		status = HAL_BUSY;
