@@ -23,6 +23,7 @@
 /* USER CODE BEGIN Includes */
 #include "modbus.h"
 #include "error_codes.h"
+#include "ee.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -62,6 +63,8 @@ uint16_t holding_register_database[NUM_HOLDING_REGISTERS] = {
 uint16_t prev_gpio_write_register;
 uint32_t wdg_time;
 uint8_t shutdown;
+
+uint8_t prev_gpio_state;
 
 /* USER CODE END PV */
 
@@ -113,6 +116,9 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
+  EE_Init(&prev_gpio_state, sizeof(uint8_t));
+  EE_Read();
+
   if(modbus_set_rx() != HAL_OK)
   {
 	  Error_Handler();
@@ -129,13 +135,20 @@ int main(void)
 	  {
 		  if(shutdown)
 		  {
-			  // Set all GPIO pins low
-			  HAL_GPIO_WritePin(RELAY_480_GPIO_Port, RELAY_480_Pin, GPIO_PIN_RESET);
-			  HAL_GPIO_WritePin(RELAY_120_GPIO_Port, RELAY_120_Pin, GPIO_PIN_RESET);
+			  // Set all GPIO pins to previous_state
+			  if((prev_gpio_state & RELAY_120_MASK) != 0)
+			  {
+				  HAL_GPIO_WritePin(RELAY_120_GPIO_Port, RELAY_120_Pin, GPIO_PIN_SET);
+			  }
+			  HAL_Delay(1000);
+			  if((prev_gpio_state & RELAY_480_MASK) != 0)
+			  {
+				  HAL_GPIO_WritePin(RELAY_480_GPIO_Port, RELAY_480_Pin, GPIO_PIN_SET);
+			  }
+			  wdg_time = HAL_GetTick();
 
 			  // Carry the pin changes to the register database
-			  holding_register_database[GPIO_WRITE] = 0;
-			  prev_gpio_write_register = 0;
+			  holding_register_database[GPIO_WRITE] = prev_gpio_state;
 
 			  // Restart the Modbus
 			  modbus_status = modbus_startup();
@@ -154,17 +167,18 @@ int main(void)
 		  holding_register_database[GPIO_READ] = ((estop_sense << ESTOP_SENSE_POS) | (sense_120 << SENSE_120_POS));
 
 		  // Handle adjustment of the GPIO_WRITE pins
-		  if(prev_gpio_write_register != holding_register_database[GPIO_WRITE])
+		  if(prev_gpio_state != holding_register_database[GPIO_WRITE])
 		  {
-			  if((prev_gpio_write_register & RELAY_120_MASK) != (holding_register_database[GPIO_WRITE] & RELAY_120_MASK))
+			  if((prev_gpio_state & RELAY_120_MASK) != (holding_register_database[GPIO_WRITE] & RELAY_120_MASK))
 			  {
 				  HAL_GPIO_WritePin(RELAY_120_GPIO_Port, RELAY_120_Pin, (holding_register_database[GPIO_WRITE] & RELAY_120_MASK));
 			  }
-			  if((prev_gpio_write_register & RELAY_480_MASK) != (holding_register_database[GPIO_WRITE] & RELAY_480_MASK))
+			  if((prev_gpio_state & RELAY_480_MASK) != (holding_register_database[GPIO_WRITE] & RELAY_480_MASK))
 			  {
 				  HAL_GPIO_WritePin(RELAY_480_GPIO_Port, RELAY_480_Pin, (holding_register_database[GPIO_WRITE] & RELAY_480_MASK));
 			  }
-			  prev_gpio_write_register = holding_register_database[GPIO_WRITE];
+			  prev_gpio_state = holding_register_database[GPIO_WRITE];
+			  EE_Write();
 			  wdg_time = HAL_GetTick();
 		  }
 
@@ -177,7 +191,8 @@ int main(void)
 
 			  // Update the holding register database
 			  holding_register_database[GPIO_WRITE] = 0;
-			  prev_gpio_write_register = 0;
+			  prev_gpio_state = 0;
+			  EE_Write();
 		  }
 
 		  // Handle Modbus Communication
@@ -286,8 +301,9 @@ int main(void)
 			  }
 
 			  // Set all GPIO pins high
-			  HAL_GPIO_WritePin(RELAY_480_GPIO_Port, RELAY_480_Pin, GPIO_PIN_SET);
 			  HAL_GPIO_WritePin(RELAY_120_GPIO_Port, RELAY_120_Pin, GPIO_PIN_SET);
+			  HAL_Delay(1000);
+			  HAL_GPIO_WritePin(RELAY_480_GPIO_Port, RELAY_480_Pin, GPIO_PIN_SET);
 
 			  // Ensure this code only executes once
 			  shutdown = 1;

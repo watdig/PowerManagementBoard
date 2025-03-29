@@ -3,7 +3,7 @@ LibFiles=Drivers\STM32C0xx_HAL_Driver\Inc\stm32c0xx_hal.h;Drivers\STM32C0xx_HAL_
 
 [PreviousUsedCubeIDEFiles]
 SourceFiles=Core\Src\main.c;Core\Src\stm32c0xx_it.c;Core\Src\stm32c0xx_hal_msp.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_cortex.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_rcc.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_rcc_ex.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_flash.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_flash_ex.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_gpio.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_dma.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_dma_ex.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_pwr.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_pwr_ex.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_exti.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_tim.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_tim_ex.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_uart.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_uart_ex.c;Drivers\CMSIS\Device\ST\STM32C0xx\Source\Templates\system_stm32c0xx.c;Core\Src\system_stm32c0xx.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_cortex.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_rcc.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_rcc_ex.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_flash.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_flash_ex.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_gpio.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_dma.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_dma_ex.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_pwr.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_pwr_ex.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_exti.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_tim.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_tim_ex.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_uart.c;Drivers\STM32C0xx_HAL_Driver\Src\stm32c0xx_hal_uart_ex.c;Drivers\CMSIS\Device\ST\STM32C0xx\Source\Templates\system_stm32c0xx.c;Core\Src\system_stm32c0xx.c;;;
-HeaderPath=Drivers\STM32C0xx_HAL_Driver\Inc;Drivers\STM32C0xx_HAL_Driver\Inc\Legacy;Drivers\CMSIS\Device\ST\STM32C0xx\Include;Drivers\CMSIS\Include;Core\Inc;
+HeaderPath=Drivers\STM32C0xx_HAL_Driver\Inc;Drivers\STM32C0xx_HAL_Driver\Inc\Legacy;Drivers\CMSIS\Device\ST\STM32C0xx\Include;Drivers\CMSIS\Include;Middlewares\Third_Party\NimaLTD_Driver\EE;Core\Inc;
 CDefines=USE_HAL_DRIVER;STM32C071xx;USE_HAL_DRIVER;USE_HAL_DRIVER;
 
 [PreviousGenFiles]
@@ -22,4 +22,12 @@ SourceFiles#2=..\Core\Src\main.c
 SourceFolderListSize=1
 SourcePath#0=..\Core\Src
 SourceFiles=;
+
+[ThirdPartyIp]
+ThirdPartyIpNumber=1
+ThirdPartyIpName#0=NimaLTD.I-CUBE-EE.3.1.3
+
+[ThirdPartyIp#NimaLTD.I-CUBE-EE.3.1.3]
+header=Middlewares\Third_Party\NimaLTD_Driver\EE\ee.h;
+source=Middlewares\Third_Party\NimaLTD_Driver\EE\ee.c;
 

@@ -1,0 +1,5 @@
+../Middlewares/Third_Party/NimaLTD_Driver/EE/ee.c:172:6:EE_Init	2
+../Middlewares/Third_Party/NimaLTD_Driver/EE/ee.c:200:10:EE_Capacity	1
+../Middlewares/Third_Party/NimaLTD_Driver/EE/ee.c:214:6:EE_Format	5
+../Middlewares/Third_Party/NimaLTD_Driver/EE/ee.c:273:6:EE_Read	5
+../Middlewares/Third_Party/NimaLTD_Driver/EE/ee.c:302:6:EE_Write	11
