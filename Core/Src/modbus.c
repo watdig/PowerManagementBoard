@@ -410,7 +410,7 @@ int8_t edit_multiple_registers(uint8_t *tx_len)
 	}
 
 	// TIMING WORKAROUND START
-//	HAL_Delay(1);
+	HAL_Delay(1);
 	// TIMING WORKAROUND END
 
 	int8_t status = modbus_send((*tx_len));
