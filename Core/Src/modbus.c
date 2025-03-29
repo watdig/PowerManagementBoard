@@ -520,6 +520,7 @@ int8_t modbus_reset()
 	status |= HAL_UARTEx_SetTxFifoThreshold(&huart1, UART_TXFIFO_THRESHOLD_1_8);
 	status |= HAL_UARTEx_SetRxFifoThreshold(&huart1, UART_RXFIFO_THRESHOLD_1_8);
 	status |= HAL_UARTEx_DisableFifoMode(&huart1);
+	status |= modbus_set_rx();
 	if(status != HAL_OK)
 	{
 		return handle_modbus_error(MB_FATAL_ERROR);
